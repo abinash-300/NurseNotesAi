@@ -1,96 +1,98 @@
-import React, { useState } from 'react';
-import Header from './components/Header.jsx';
-import Recorder from './components/Recorder.jsx';
-import SoapOutput from './components/SoapOutput.jsx';
+import { useState } from 'react';
+import ScreenIdle      from './components/ScreenIdle.jsx';
+import ScreenRecording from './components/ScreenRecording.jsx';
+import ScreenProcessing from './components/ScreenProcessing.jsx';
+import ScreenResult    from './components/ScreenResult.jsx';
 
-const SYSTEM_PROMPT = `You are an expert clinical documentation assistant specializing in nursing notes.
-Convert the nurse's verbal report into a structured SOAP note.
-Return ONLY a valid JSON object with exactly these four keys: "subjective", "objective", "assessment", "plan"
-Each value should be a clear, concise clinical paragraph (2-5 sentences).
-Use proper medical terminology. Be factual — only document what was stated.
-Do not add assumptions. Do not include any text outside the JSON object.`;
+const DEMO_TRANSCRIPT =
+  'Patient is a 68-year-old male presenting with chest tightness and shortness of breath that started about 2 hours ago. He rates the pain 6 out of 10, describes it as pressure-like, radiating to the left arm. He has a history of hypertension and type 2 diabetes. Current medications include metformin and lisinopril. He denies nausea or vomiting. Vitals on admission: blood pressure 158 over 94, heart rate 88 beats per minute, respiratory rate 20, oxygen saturation 96% on room air, temperature 98.6. Patient appears anxious but alert and oriented times 3. Lung sounds clear bilaterally, heart rhythm regular. 12-lead EKG ordered, troponin levels sent to lab. Patient placed on cardiac monitor. IV access established in right antecubital. Oxygen applied via nasal cannula at 2 liters. Nitroglycerin 0.4 mg sublingual administered per protocol. Physician notified of patient status.';
 
+// State machine: idle → recording → processing → result
+//                                  ↑ (demo shortcut)
 export default function App() {
+  const [screen,     setScreen]     = useState('idle');
   const [transcript, setTranscript] = useState('');
-  const [soap, setSoap] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [soap,       setSoap]       = useState(null);
+  const [meta,       setMeta]       = useState(null);
+  const [toast,      setToast]      = useState('');
 
-  const generateSOAP = async () => {
-    setLoading(true);
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 5000);
+  };
+
+  const startRecording = () => {
+    setTranscript('');
     setSoap(null);
-    setError(null);
+    setMeta(null);
+    setScreen('recording');
+  };
 
-    try {
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
-          messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
-            {
-              role: 'user',
-              content: `Convert this nurse's verbal report into a SOAP note:\n\n${transcript}`,
-            },
-          ],
-          max_tokens: 1000,
-        }),
-      });
+  const stopAndProcess = () => setScreen('processing');
 
-      const data = await response.json();
+  const loadDemo = () => {
+    setTranscript(DEMO_TRANSCRIPT);
+    setSoap(null);
+    setMeta(null);
+    setScreen('processing');
+  };
 
-      if (!response.ok) {
-        throw new Error(data.error?.message || 'Groq API error');
-      }
+  const onProcessDone = (soapData, metaData) => {
+    setSoap(soapData);
+    setMeta(metaData);
+    setScreen('result');
+  };
 
-      let responseText = data.choices[0].message.content;
-      responseText = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  const onProcessError = (msg) => {
+    showToast(msg);
+    setScreen('idle');
+  };
 
-      const soapNote = JSON.parse(responseText);
-      setSoap(soapNote);
-    } catch (err) {
-      if (err instanceof SyntaxError) {
-        setError('Failed to parse AI response as JSON. Please try again.');
-      } else {
-        setError(err.message);
-      }
-    } finally {
-      setLoading(false);
-    }
+  const newSession = () => {
+    setTranscript('');
+    setSoap(null);
+    setMeta(null);
+    setScreen('idle');
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      <div className="max-w-3xl mx-auto px-4 py-4 sm:py-8">
-        <Header />
+    <>
+      {/* Error toast */}
+      {toast && (
+        <div
+          className="fixed top-4 left-4 right-4 z-50 rounded-xl px-4 py-3 font-mono text-sm"
+          style={{
+            background: 'rgba(127,29,29,0.92)',
+            border: '1px solid rgba(248,113,113,0.30)',
+            color: '#fca5a5',
+            backdropFilter: 'blur(8px)',
+          }}
+        >
+          {toast}
+        </div>
+      )}
 
-        <main className="mt-6 sm:mt-8 space-y-6">
-          <Recorder
-            transcript={transcript}
-            setTranscript={setTranscript}
-            onGenerate={generateSOAP}
-            loading={loading}
-          />
-
-          {error && (
-            <div className="border border-red-500 bg-red-950/30 rounded-lg p-4">
-              <p className="text-red-400 text-sm font-mono">ERROR: {error}</p>
-            </div>
-          )}
-
-          <SoapOutput soap={soap} />
-        </main>
-
-        <footer className="mt-12 sm:mt-16 pb-6 sm:pb-8 text-center">
-          <p className="text-slate-600 text-[10px] sm:text-xs font-mono tracking-widest">
-            NURSENOTE AI · PROTOTYPE · FOR EDUCATIONAL USE ONLY · NOT FOR REAL PATIENT DATA
-          </p>
-        </footer>
-      </div>
-    </div>
+      {screen === 'idle' && (
+        <ScreenIdle onStart={startRecording} onDemo={loadDemo} />
+      )}
+      {screen === 'recording' && (
+        <ScreenRecording
+          transcript={transcript}
+          setTranscript={setTranscript}
+          onStop={stopAndProcess}
+          onCancel={newSession}
+        />
+      )}
+      {screen === 'processing' && (
+        <ScreenProcessing
+          transcript={transcript}
+          onDone={onProcessDone}
+          onError={onProcessError}
+        />
+      )}
+      {screen === 'result' && (
+        <ScreenResult soap={soap} meta={meta} onNew={newSession} />
+      )}
+    </>
   );
 }

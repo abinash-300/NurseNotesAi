@@ -2,45 +2,164 @@
 @tailwind components;
 @tailwind utilities;
 
-@keyframes pulse-ring {
-  0% {
-    transform: scale(0.9);
-    opacity: 1;
+@layer base {
+  :root {
+    --navy-border:        rgba(120, 160, 255, 0.08);
+    --navy-border-strong: rgba(120, 180, 255, 0.16);
+    --edge-highlight:     inset 0 1px 0 rgba(255,255,255,0.04), inset 0 -1px 0 rgba(0,0,0,0.40);
+    --glow-cyan-md:       0 0 0 1px rgba(34,211,238,0.30), 0 8px 32px rgba(34,211,238,0.22);
   }
-  100% {
-    transform: scale(1.4);
-    opacity: 0;
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: #02050e;
+    color: #f4f7ff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior: none;
+  }
+
+  /* wave-bar uses scaleY — needs a raw @keyframes outside Tailwind's keyframe map */
+  @keyframes wave-bar {
+    0%, 100% { transform: scaleY(0.22); }
+    50%       { transform: scaleY(1); }
   }
 }
 
-@keyframes wave {
-  0%, 100% {
+@layer components {
+  /* ── Screen shell ────────────────────────────────── */
+  .screen {
+    @apply relative flex flex-col bg-navy-950 overflow-hidden;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background-image:
+      radial-gradient(60% 50% at 50% 30%, rgba(34,211,238,0.10), transparent 70%),
+      radial-gradient(40% 30% at 50% 70%, rgba(99,102,241,0.06), transparent 70%);
+  }
+  .screen::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none z-0;
+    background-image: radial-gradient(rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 3px 3px;
+    mix-blend-mode: overlay;
+    opacity: 0.6;
+  }
+
+  /* ── Cards ──────────────────────────────────────── */
+  .card-glass {
+    background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01));
+    border: 1px solid var(--navy-border);
+    border-radius: 18px;
+    box-shadow: var(--edge-highlight);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .card-solid {
+    background: #08102a;
+    border: 1px solid var(--navy-border);
+    border-radius: 18px;
+    box-shadow: var(--edge-highlight);
+  }
+
+  /* ── Chips ──────────────────────────────────────── */
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full font-mono text-ink-3 flex-shrink-0;
+    padding: 5px 10px;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--navy-border);
+  }
+  .chip.chip-live {
+    background: rgba(34,211,238,0.08);
+    border-color: rgba(34,211,238,0.25);
+    @apply text-cyan-300;
+  }
+  .chip.chip-rec {
+    background: rgba(248,113,113,0.10);
+    border-color: rgba(248,113,113,0.30);
+    color: #fca5a5;
+  }
+  .chip.chip-ok {
+    background: rgba(52,211,153,0.08);
+    border-color: rgba(52,211,153,0.25);
+    color: #6ee7b7;
+  }
+
+  /* ── Status dot ─────────────────────────────────── */
+  .dot {
+    @apply rounded-full flex-shrink-0 inline-block;
+    width: 6px;
     height: 6px;
+    background: currentColor;
+    box-shadow: 0 0 8px currentColor;
   }
-  50% {
-    height: 22px;
+
+  /* ── Buttons ─────────────────────────────────────── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 font-sans font-semibold
+           cursor-pointer transition-all duration-200 select-none;
+    padding: 14px 22px;
+    border-radius: 14px;
+    font-size: 15px;
+    color: #03101a;
+    background: linear-gradient(180deg, #67e8f9 0%, #06b6d4 100%);
+    box-shadow: var(--glow-cyan-md);
+    border: none;
+    -webkit-tap-highlight-color: transparent;
   }
-}
+  .btn-primary:hover  { box-shadow: 0 0 0 1px rgba(34,211,238,0.40), 0 16px 64px rgba(34,211,238,0.30); }
+  .btn-primary:active { transform: translateY(1px); }
+  .btn-primary:disabled { opacity: 0.5; box-shadow: none; cursor: not-allowed; transform: none; }
 
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 font-sans font-medium
+           cursor-pointer transition-all duration-200 select-none;
+    padding: 12px 18px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--navy-border-strong);
+    color: #c8d3ed;
+    font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  .btn-ghost:hover { background: rgba(255,255,255,0.06); color: #f4f7ff; }
+
+  .btn-icon {
+    @apply inline-flex items-center justify-center cursor-pointer
+           transition-all duration-150 select-none;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--navy-border);
+    color: #8a99c2;
+    -webkit-tap-highlight-color: transparent;
   }
-}
+  .btn-icon:hover { background: rgba(255,255,255,0.07); color: #f4f7ff; border-color: var(--navy-border-strong); }
 
-.animate-pulse-ring {
-  animation: pulse-ring 1.2s ease-out infinite;
-}
+  /* ── Typography helpers ─────────────────────────── */
+  .eyebrow {
+    @apply font-mono uppercase text-ink-4;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    font-weight: 500;
+  }
+  .eyebrow-red  { color: #f87171; }
+  .eyebrow-cyan { @apply text-cyan-400; }
 
-.animate-wave {
-  animation: wave 0.8s ease-in-out infinite;
-}
-
-.animate-fade-up {
-  animation: fade-up 0.4s ease-out both;
+  /* ── Scrollbar ───────────────────────────────────── */
+  .scroll-thin::-webkit-scrollbar { width: 4px; }
+  .scroll-thin::-webkit-scrollbar-thumb {
+    background: var(--navy-border-strong);
+    border-radius: 4px;
+  }
+  .scroll-thin { scrollbar-width: thin; scrollbar-color: var(--navy-border-strong) transparent; }
 }
