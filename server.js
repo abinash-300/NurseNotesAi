@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import Anthropic from '@anthropic-ai/sdk';
+import { readFileSync } from 'fs';
 
 dotenv.config();
 
@@ -9,7 +10,27 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+function buildAnthropicClient() {
+  if (process.env.ANTHROPIC_API_KEY) {
+    return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  }
+  // In Claude Code remote environments the session ingress token provides
+  // authenticated access via Bearer auth — no user-supplied key needed.
+  const tokenFile = process.env.CLAUDE_SESSION_INGRESS_TOKEN_FILE;
+  if (tokenFile) {
+    const authToken = readFileSync(tokenFile, 'utf8').trim();
+    return new Anthropic({
+      apiKey: 'not-required',
+      defaultHeaders: {
+        'x-api-key': null,
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+  }
+  return new Anthropic({ apiKey: 'not-configured' });
+}
+
+const anthropic = buildAnthropicClient();
 
 app.post('/api/generate-soap', async (req, res) => {
   const { transcript } = req.body;
