@@ -17,7 +17,7 @@ export default function Recorder({ transcript, setTranscript, onGenerate, loadin
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      setRecError('Speech recognition is not supported in this browser. Try Chrome or Edge.');
+      setRecError('Voice not supported here. On iPhone use Chrome; on desktop use Chrome or Edge.');
       return false;
     }
 
@@ -86,7 +86,7 @@ export default function Recorder({ transcript, setTranscript, onGenerate, loadin
   const displayTranscript = transcript + (interimTranscript ? ` ${interimTranscript}` : '');
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 flex flex-col items-center gap-6">
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-8 flex flex-col items-center gap-5 sm:gap-6">
       {/* Mic button */}
       <div className="relative flex items-center justify-center">
         {isRecording && (
