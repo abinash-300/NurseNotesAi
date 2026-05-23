@@ -15,7 +15,7 @@ export default function App() {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:3001/api/generate-soap', {
+      const response = await fetch('/api/generate-soap', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ transcript }),

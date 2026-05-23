@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "concurrently \"node server.js\" \"vite client/\""
+    "dev": "concurrently \"node server.js\" \"vite client/\"",
+    "build": "vite build client/"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.52.0",
