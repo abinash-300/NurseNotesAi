@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 export default function Waveform({ active, count = 48, color = '#f87171', height = 56 }) {
   const bars = useMemo(() =>

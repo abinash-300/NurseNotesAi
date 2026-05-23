@@ -1,3 +1,4 @@
+import React from 'react';
 import { Zap, ChevronRight, Activity, Lock } from 'lucide-react';
 import BrandRow from './BrandRow.jsx';
 import MicCore from './MicCore.jsx';

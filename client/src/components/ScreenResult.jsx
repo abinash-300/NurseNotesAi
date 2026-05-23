@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { ArrowLeft, MoreHorizontal, Copy, Check, Edit2, Flag, FileOutput, Plus } from 'lucide-react';
 
 const SOAP_META = [
@@ -83,7 +83,7 @@ export default function ScreenResult({ soap, meta, onNew }) {
   const secs     = ((meta?.ms ?? 0) / 1000).toFixed(2);
   const wordsIn  = meta?.wordsIn  ?? 0;
   const wordsOut = meta?.wordsOut ?? 0;
-  const model    = meta?.model    ?? MODEL;
+  const model    = meta?.model    ?? 'llama-3.1-8b-instant';
 
   return (
     <div className="screen">

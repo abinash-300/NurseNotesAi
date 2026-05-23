@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Brain, Check, Activity, Shield } from 'lucide-react';
 import BrandRow from './BrandRow.jsx';
 

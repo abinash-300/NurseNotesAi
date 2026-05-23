@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import ScreenIdle      from './components/ScreenIdle.jsx';
 import ScreenRecording from './components/ScreenRecording.jsx';
 import ScreenProcessing from './components/ScreenProcessing.jsx';

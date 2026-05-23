@@ -1,3 +1,4 @@
+import React from 'react';
 import { Mic, Square } from 'lucide-react';
 
 export default function MicCore({ recording = false, onTap, size = 140 }) {
