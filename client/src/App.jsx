@@ -17,6 +17,7 @@ export default function App() {
   const [toast,          setToast]          = useState('');
   const [sessions,       setSessions]       = useState([]);
   const [sessionCounter, setSessionCounter] = useState(1001);
+  const [specialty,      setSpecialty]      = useState('general');
 
   const showToast = (msg) => {
     setToast(msg);
@@ -85,7 +86,7 @@ export default function App() {
       )}
 
       {screen === 'idle' && (
-        <ScreenIdle onStart={startRecording} onDemo={loadDemo} sessions={sessions} onOpenSession={openSession} />
+        <ScreenIdle onStart={startRecording} onDemo={loadDemo} sessions={sessions} onOpenSession={openSession} specialty={specialty} onSpecialtyChange={setSpecialty} />
       )}
       {screen === 'recording' && (
         <ScreenRecording
@@ -98,6 +99,7 @@ export default function App() {
       {screen === 'processing' && (
         <ScreenProcessing
           transcript={transcript}
+          specialty={specialty}
           onDone={onProcessDone}
           onError={onProcessError}
         />

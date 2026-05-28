@@ -5,6 +5,50 @@ import MicCore from './MicCore.jsx';
 
 const speechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
+const SPECIALTIES = [
+  { key: 'general',    label: 'General'    },
+  { key: 'icu',        label: 'ICU'        },
+  { key: 'er',         label: 'ER'         },
+  { key: 'medsurg',    label: 'Med-Surg'   },
+  { key: 'pediatrics', label: 'Pediatrics' },
+  { key: 'cardiac',    label: 'Cardiac'    },
+];
+
+function SpecialtyRow({ specialty, onChange }) {
+  return (
+    <div
+      className="flex gap-2 w-full"
+      style={{ overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch', paddingBottom: 2 }}
+    >
+      {SPECIALTIES.map((s) => {
+        const active = specialty === s.key;
+        return (
+          <button
+            key={s.key}
+            onClick={() => onChange(s.key)}
+            className="flex-shrink-0 font-mono"
+            style={{
+              padding: '6px 14px',
+              borderRadius: 99,
+              fontSize: 11,
+              letterSpacing: '0.04em',
+              border: `1px solid ${active ? 'rgba(34,211,238,0.45)' : 'var(--navy-border)'}`,
+              background: active ? 'rgba(34,211,238,0.10)' : 'rgba(255,255,255,0.02)',
+              color: active ? '#22d3ee' : '#5f6e96',
+              boxShadow: active ? '0 0 10px rgba(34,211,238,0.18)' : 'none',
+              transition: 'all 180ms ease',
+              cursor: 'pointer',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            {s.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function timeAgo(ts) {
   const secs = Math.floor((Date.now() - ts) / 1000);
   if (secs < 10)   return 'Just now';
@@ -19,7 +63,7 @@ function subjectivePreview(text) {
   return words.slice(0, 7).join(' ') + (words.length > 7 ? '…' : '');
 }
 
-export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSession }) {
+export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSession, specialty = 'general', onSpecialtyChange }) {
   return (
     <div className="screen">
       <BrandRow state="idle" />
@@ -42,7 +86,9 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
             </span>
           </div>
 
-          <button className="btn-ghost" onClick={onDemo} style={{ padding: '10px 16px', marginTop: 4 }}>
+          <SpecialtyRow specialty={specialty} onChange={onSpecialtyChange} />
+
+          <button className="btn-ghost" onClick={onDemo} style={{ padding: '10px 16px' }}>
             <Zap size={14} />
             <span className="font-mono" style={{ fontSize: 12, letterSpacing: '0.04em' }}>
               Load demo patient
@@ -76,7 +122,9 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
             </span>
           </div>
 
-          <div className="w-full flex flex-col gap-3 mt-2">
+          <SpecialtyRow specialty={specialty} onChange={onSpecialtyChange} />
+
+          <div className="w-full flex flex-col gap-3">
             <button
               className="btn-primary w-full"
               onClick={onDemo}

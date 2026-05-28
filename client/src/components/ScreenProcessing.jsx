@@ -2,12 +2,26 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Brain, Check, Activity, Shield } from 'lucide-react';
 import BrandRow from './BrandRow.jsx';
 
-const SYSTEM_PROMPT = `You are an expert clinical documentation assistant specializing in nursing notes.
+const BASE_PROMPT = `You are an expert clinical documentation assistant specializing in nursing notes.
 Convert the nurse's verbal report into a structured SOAP note.
 Return ONLY a valid JSON object with exactly these four keys: "subjective", "objective", "assessment", "plan"
 Each value should be a clear, concise clinical paragraph (2-5 sentences).
 Use proper medical terminology. Be factual — only document what was stated.
 Do not add assumptions. Do not include any text outside the JSON object.`;
+
+const SPECIALTY_ADDONS = {
+  general:    '',
+  icu:        'Specialty focus — ICU: emphasize ventilator settings (mode, FiO2, PEEP, tidal volume), vasoactive drips (name, dose, concentration), neuro checks (GCS, pupil response), and hourly outputs (urine, drains).',
+  er:         'Specialty focus — ER: emphasize triage acuity, chief complaint with onset and severity, time-sensitive interventions performed, disposition plan, and pending consults or orders.',
+  medsurg:    'Specialty focus — Med-Surg: emphasize ADL status and functional ability, mobility and fall risk, wound care details, pain management, and discharge planning needs including patient education.',
+  pediatrics: 'Specialty focus — Pediatrics: emphasize patient weight and weight-based dosing, age-appropriate developmental assessments, guardian presence and education given, immunization history if relevant.',
+  cardiac:    'Specialty focus — Cardiac: emphasize cardiac rhythm and rate, ejection fraction if known, chest pain characteristics (onset, quality, radiation, severity), cardiac enzyme results, hemodynamic status, and cardiac medications.',
+};
+
+const SPECIALTY_LABELS = {
+  general: 'General', icu: 'ICU', er: 'ER',
+  medsurg: 'Med-Surg', pediatrics: 'Pediatrics', cardiac: 'Cardiac',
+};
 
 const MODEL = 'llama-3.1-8b-instant';
 
@@ -18,7 +32,12 @@ const SOAP_META = [
   { key: 'plan',       letter: 'P', title: 'Plan',       color: '#34d399' },
 ];
 
-async function callGroq(transcript) {
+function buildPrompt(specialty) {
+  const addon = SPECIALTY_ADDONS[specialty] ?? '';
+  return addon ? `${BASE_PROMPT}\n\n${addon}` : BASE_PROMPT;
+}
+
+async function callGroq(transcript, systemPrompt) {
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -28,7 +47,7 @@ async function callGroq(transcript) {
     body: JSON.stringify({
       model: MODEL,
       messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'system', content: systemPrompt },
         { role: 'user',   content: `Convert this nurse's verbal report into a SOAP note:\n\n${transcript}` },
       ],
       max_tokens: 1000,
@@ -41,10 +60,12 @@ async function callGroq(transcript) {
   return JSON.parse(text);
 }
 
-export default function ScreenProcessing({ transcript, onDone, onError }) {
+export default function ScreenProcessing({ transcript, specialty = 'general', onDone, onError }) {
   const [step, setStep] = useState(0);
   const [tick, setTick] = useState(0);
   const startedAt = useRef(Date.now());
+
+  const specialtyLabel = SPECIALTY_LABELS[specialty] ?? 'General';
 
   // Cosmetic pipeline — one step every 550 ms
   useEffect(() => {
@@ -62,18 +83,19 @@ export default function ScreenProcessing({ transcript, onDone, onError }) {
   // Real API call
   useEffect(() => {
     let cancelled = false;
+    const systemPrompt = buildPrompt(specialty);
     (async () => {
       try {
-        const soap = await callGroq(transcript);
+        const soap = await callGroq(transcript, systemPrompt);
         if (cancelled) return;
         const elapsed = Date.now() - startedAt.current;
         const meta = {
-          ms:       elapsed,
-          model:    MODEL,
-          wordsIn:  transcript.trim().split(/\s+/).length,
-          wordsOut: Object.values(soap).join(' ').trim().split(/\s+/).length,
+          ms:        elapsed,
+          model:     MODEL,
+          specialty: specialty,
+          wordsIn:   transcript.trim().split(/\s+/).length,
+          wordsOut:  Object.values(soap).join(' ').trim().split(/\s+/).length,
         };
-        // Let the pipeline animation finish before transitioning
         const minDelay = (SOAP_META.length - 1) * 550 + 200;
         const wait = Math.max(0, minDelay - elapsed);
         setTimeout(() => { if (!cancelled) onDone(soap, meta); }, wait);
@@ -111,7 +133,7 @@ export default function ScreenProcessing({ transcript, onDone, onError }) {
             Synthesizing note
           </h2>
           <span className="font-mono text-ink-4" style={{ fontSize: 11, letterSpacing: '0.06em' }}>
-            {wordCount} words · {MODEL}
+            {wordCount} words · {specialtyLabel} template
           </span>
         </div>
 
@@ -130,7 +152,6 @@ export default function ScreenProcessing({ transcript, onDone, onError }) {
                   transition: 'opacity 300ms',
                 }}
               >
-                {/* Ring */}
                 <div
                   className="flex items-center justify-center font-mono relative flex-shrink-0"
                   style={{
@@ -174,7 +195,7 @@ export default function ScreenProcessing({ transcript, onDone, onError }) {
             </span>
           </div>
           <span className="chip chip-live" style={{ fontSize: 9 }}>
-            <span className="dot animate-pulse-dot" /> Groq · live
+            <span className="dot animate-pulse-dot" /> {specialtyLabel} template · Groq live
           </span>
         </div>
       </div>

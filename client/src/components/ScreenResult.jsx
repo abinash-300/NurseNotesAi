@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, MoreHorizontal, Copy, Check, Edit2, Flag, FileOutput, Plus, X } from 'lucide-react';
 
+const SPECIALTY_LABELS = {
+  general: 'General', icu: 'ICU', er: 'ER',
+  medsurg: 'Med-Surg', pediatrics: 'Pediatrics', cardiac: 'Cardiac',
+};
+
 function timeAgo(ts) {
   if (!ts) return 'JUST NOW';
   const secs = Math.floor((Date.now() - ts) / 1000);
@@ -182,11 +187,12 @@ export default function ScreenResult({ soap, meta, onNew }) {
     setTimeout(() => setFullCopied(false), 1800);
   };
 
-  const secs          = ((meta?.ms ?? 0) / 1000).toFixed(2);
-  const wordsIn       = meta?.wordsIn       ?? 0;
-  const wordsOut      = meta?.wordsOut      ?? 0;
-  const sessionNumber = meta?.sessionNumber ?? '—';
-  const timestamp     = timeAgo(meta?.createdAt);
+  const secs            = ((meta?.ms ?? 0) / 1000).toFixed(2);
+  const wordsIn         = meta?.wordsIn       ?? 0;
+  const wordsOut        = meta?.wordsOut      ?? 0;
+  const sessionNumber   = meta?.sessionNumber ?? '—';
+  const timestamp       = timeAgo(meta?.createdAt);
+  const specialtyLabel  = SPECIALTY_LABELS[meta?.specialty] ?? 'General';
 
   return (
     <div className="screen">
@@ -209,7 +215,16 @@ export default function ScreenResult({ soap, meta, onNew }) {
       {/* Context chips */}
       <div className="relative z-10 flex gap-1.5 flex-wrap px-4 pb-2">
         <span className="chip">68 M</span>
-        <span className="chip">Cardiac</span>
+        <span
+          className="chip"
+          style={{
+            background: 'rgba(34,211,238,0.08)',
+            border: '1px solid rgba(34,211,238,0.30)',
+            color: '#22d3ee',
+          }}
+        >
+          {specialtyLabel}
+        </span>
         <span className="chip">2h ago</span>
         <span className="chip chip-ok"><span className="dot" />Vitals captured</span>
       </div>
