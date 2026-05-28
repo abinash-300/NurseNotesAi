@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, MoreHorizontal, Copy, Check, Edit2, Flag, Share2, Plus, X } from 'lucide-react';
 
+const CLEAR_SECS = 300; // 5 minutes
+
 const SPECIALTY_LABELS = {
   general: 'General', icu: 'ICU', er: 'ER',
   medsurg: 'Med-Surg', pediatrics: 'Pediatrics', cardiac: 'Cardiac',
@@ -13,6 +15,12 @@ function timeAgo(ts) {
   if (secs < 60)   return `${secs}S AGO`;
   if (secs < 3600) return `${Math.floor(secs / 60)} MIN AGO`;
   return `${Math.floor(secs / 3600)}H AGO`;
+}
+
+function fmtCountdown(secs) {
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
 const SOAP_META = [
@@ -54,33 +62,20 @@ function SoapCard({ section, body, index, onSave }) {
     setTimeout(() => setCopied(false), 1600);
   };
 
-  const startEdit = () => {
-    setDraft(body);
-    setEditing(true);
-  };
-
-  const save = () => {
-    onSave(draft);
-    setEditing(false);
-  };
-
-  const cancel = () => {
-    setEditing(false);
-  };
+  const startEdit = () => { setDraft(body); setEditing(true); };
+  const save      = () => { onSave(draft); setEditing(false); };
+  const cancel    = () => { setEditing(false); };
 
   return (
     <div
       className="card-glass animate-rise-in"
       style={{ padding: '14px 16px', animationDelay: `${index * 90}ms` }}
     >
-      {/* Card header */}
       <div className="flex items-center justify-between mb-2.5">
         <div className="flex items-center gap-3">
           <SoapRing letter={section.letter} color={section.color} />
           <div className="flex flex-col" style={{ lineHeight: 1.2 }}>
-            <span className="text-ink-1 font-semibold" style={{ fontSize: 15 }}>
-              {section.title}
-            </span>
+            <span className="text-ink-1 font-semibold" style={{ fontSize: 15 }}>{section.title}</span>
             <span className="font-mono text-ink-4" style={{ fontSize: 10, letterSpacing: '0.08em' }}>
               {words} WORDS{editing ? ' · EDITING' : ''}
             </span>
@@ -88,23 +83,13 @@ function SoapCard({ section, body, index, onSave }) {
         </div>
 
         {editing ? (
-          /* In edit mode: only show an X to cancel via the header */
-          <button className="btn-icon" onClick={cancel} aria-label="Cancel edit">
-            <X size={14} />
-          </button>
+          <button className="btn-icon" onClick={cancel} aria-label="Cancel edit"><X size={14} /></button>
         ) : (
           <div className="flex gap-1">
             <button className="btn-icon" onClick={copy} aria-label="Copy">
-              {copied
-                ? <Check size={14} style={{ color: '#6ee7b7' }} />
-                : <Copy size={14} />}
+              {copied ? <Check size={14} style={{ color: '#6ee7b7' }} /> : <Copy size={14} />}
             </button>
-            <button
-              className="btn-icon"
-              onClick={startEdit}
-              aria-label="Edit"
-              style={{ color: '#c8d3ed' }}
-            >
+            <button className="btn-icon" onClick={startEdit} aria-label="Edit" style={{ color: '#c8d3ed' }}>
               <Edit2 size={14} />
             </button>
             <button className="btn-icon" aria-label="Flag"><Flag size={14} /></button>
@@ -112,7 +97,6 @@ function SoapCard({ section, body, index, onSave }) {
         )}
       </div>
 
-      {/* Body — read or edit */}
       {editing ? (
         <>
           <textarea
@@ -120,37 +104,24 @@ function SoapCard({ section, body, index, onSave }) {
             onChange={(e) => setDraft(e.target.value)}
             autoFocus
             style={{
-              display: 'block',
-              width: '100%',
-              minHeight: 96,
+              display: 'block', width: '100%', minHeight: 96,
               background: 'rgba(255,255,255,0.03)',
               border: `1px solid ${section.color}44`,
-              borderRadius: 8,
-              color: '#c8d3ed',
-              fontSize: 13.5,
-              lineHeight: 1.6,
+              borderRadius: 8, color: '#c8d3ed',
+              fontSize: 13.5, lineHeight: 1.6,
               fontFamily: 'Sora, system-ui, sans-serif',
-              padding: '9px 11px',
-              resize: 'vertical',
-              outline: 'none',
-              boxSizing: 'border-box',
+              padding: '9px 11px', resize: 'vertical',
+              outline: 'none', boxSizing: 'border-box',
             }}
           />
           <div className="flex gap-2 mt-2.5">
-            <button
-              className="btn-ghost"
-              onClick={cancel}
-              style={{ flex: 1, padding: '7px 10px', fontSize: 12, borderRadius: 8 }}
-            >
+            <button className="btn-ghost" onClick={cancel}
+              style={{ flex: 1, padding: '7px 10px', fontSize: 12, borderRadius: 8 }}>
               Cancel
             </button>
-            <button
-              className="btn-primary"
-              onClick={save}
-              style={{ flex: 2, padding: '7px 10px', fontSize: 12, borderRadius: 8 }}
-            >
-              <Check size={13} />
-              Save
+            <button className="btn-primary" onClick={save}
+              style={{ flex: 2, padding: '7px 10px', fontSize: 12, borderRadius: 8 }}>
+              <Check size={13} /> Save
             </button>
           </div>
         </>
@@ -164,7 +135,8 @@ function SoapCard({ section, body, index, onSave }) {
 export default function ScreenResult({ soap, meta, onNew, showToast }) {
   const [fullCopied, setFullCopied] = useState(false);
   const [editedSoap, setEditedSoap] = useState(() => ({ ...soap }));
-  const [, forceUpdate] = useState(0);
+  const [, forceUpdate]             = useState(0);
+  const [remaining,  setRemaining]  = useState(CLEAR_SECS);
 
   // Re-render every 15s so the "X mins ago" timestamp stays fresh
   useEffect(() => {
@@ -172,11 +144,24 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
     return () => clearInterval(t);
   }, []);
 
-  const updateSection = (key, text) => {
-    setEditedSoap((prev) => ({ ...prev, [key]: text }));
-  };
+  // Countdown — cancels automatically if user navigates away (cleanup)
+  useEffect(() => {
+    const t = setInterval(() => setRemaining((r) => Math.max(0, r - 1)), 1000);
+    return () => clearInterval(t);
+  }, []);
 
-  // fullNote always uses the latest edited text
+  // Fire when countdown reaches zero
+  useEffect(() => {
+    if (remaining === 0) {
+      showToast?.('Session cleared for privacy');
+      onNew();
+    }
+  }, [remaining]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const timerColor = remaining > 120 ? '#34d399' : remaining > 30 ? '#fbbf24' : '#f87171';
+
+  const updateSection = (key, text) => setEditedSoap((prev) => ({ ...prev, [key]: text }));
+
   const fullNote = SOAP_META
     .map((s) => `${s.title.toUpperCase()}:\n${editedSoap[s.key] ?? ''}`)
     .join('\n\n');
@@ -201,15 +186,33 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
     }
   };
 
-  const secs            = ((meta?.ms ?? 0) / 1000).toFixed(2);
-  const wordsIn         = meta?.wordsIn       ?? 0;
-  const wordsOut        = meta?.wordsOut      ?? 0;
-  const sessionNumber   = meta?.sessionNumber ?? '—';
-  const timestamp       = timeAgo(meta?.createdAt);
-  const specialtyLabel  = SPECIALTY_LABELS[meta?.specialty] ?? 'General';
+  const secs           = ((meta?.ms ?? 0) / 1000).toFixed(2);
+  const wordsIn        = meta?.wordsIn       ?? 0;
+  const wordsOut       = meta?.wordsOut      ?? 0;
+  const sessionNumber  = meta?.sessionNumber ?? '—';
+  const timestamp      = timeAgo(meta?.createdAt);
+  const specialtyLabel = SPECIALTY_LABELS[meta?.specialty] ?? 'General';
 
   return (
     <div className="screen">
+      {/* Draining progress bar — absolute at the very top */}
+      <div
+        style={{
+          position: 'absolute', top: 0, left: 0, right: 0, height: 3, zIndex: 30,
+          background: 'rgba(255,255,255,0.05)',
+        }}
+      >
+        <div
+          style={{
+            height: '100%',
+            width: `${(remaining / CLEAR_SECS) * 100}%`,
+            background: timerColor,
+            boxShadow: `0 0 6px ${timerColor}99`,
+            transition: 'width 1s linear, background-color 600ms ease, box-shadow 600ms ease',
+          }}
+        />
+      </div>
+
       {/* Header */}
       <div className="relative z-10 flex items-center justify-between px-4 pt-3.5 pb-1.5">
         <button className="btn-icon" onClick={onNew} aria-label="New session">
@@ -224,6 +227,32 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
           </span>
         </div>
         <button className="btn-icon" aria-label="More"><MoreHorizontal size={16} /></button>
+      </div>
+
+      {/* Auto-clear countdown chip */}
+      <div className="relative z-10 flex justify-center px-4 pb-1">
+        <span
+          className="font-mono flex items-center gap-1.5"
+          style={{
+            fontSize: 10, letterSpacing: '0.06em',
+            padding: '4px 10px', borderRadius: 99,
+            color: timerColor,
+            background: `${timerColor}14`,
+            border: `1px solid ${timerColor}38`,
+            transition: 'color 600ms ease, background 600ms ease, border-color 600ms ease',
+          }}
+        >
+          <span
+            style={{
+              width: 5, height: 5, borderRadius: '50%',
+              background: timerColor,
+              display: 'inline-block',
+              flexShrink: 0,
+              transition: 'background 600ms ease',
+            }}
+          />
+          Clears in {fmtCountdown(remaining)}
+        </span>
       </div>
 
       {/* Context chips */}
@@ -264,17 +293,15 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
           style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--navy-border)' }}
         >
           {[
-            { label: 'GENERATED IN',    value: `${secs}s`,                    mono: true  },
-            { label: 'MODEL',           value: 'llama-3.1-8b',                 mono: true  },
-            { label: 'CONFIDENCE',      value: 'HIGH · 94%',                   green: true },
-            { label: 'WORDS IN / OUT',  value: `${wordsIn} / ${wordsOut}`,     mono: true  },
+            { label: 'GENERATED IN',   value: `${secs}s`               },
+            { label: 'MODEL',          value: 'llama-3.1-8b'            },
+            { label: 'CONFIDENCE',     value: 'HIGH · 94%', green: true },
+            { label: 'WORDS IN / OUT', value: `${wordsIn} / ${wordsOut}` },
           ].map(({ label, value, green }) => (
             <div key={label} className="flex flex-col gap-0.5">
               <span className="eyebrow" style={{ fontSize: 9 }}>{label}</span>
-              <span
-                className="font-mono tabular-nums"
-                style={{ fontSize: 13, color: green ? '#6ee7b7' : '#f4f7ff' }}
-              >
+              <span className="font-mono tabular-nums"
+                style={{ fontSize: 13, color: green ? '#6ee7b7' : '#f4f7ff' }}>
                 {value}
               </span>
             </div>
@@ -290,28 +317,17 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
           background: 'linear-gradient(180deg, transparent, #050a1a 30%)',
         }}
       >
-        <button
-          className="btn-icon"
-          onClick={handleShare}
-          aria-label="Share note"
-          style={{ width: 48, height: 48, borderRadius: 14 }}
-        >
+        <button className="btn-icon" onClick={handleShare} aria-label="Share note"
+          style={{ width: 48, height: 48, borderRadius: 14 }}>
           <Share2 size={18} />
         </button>
-        <button
-          className="btn-primary flex-1"
-          onClick={copyFull}
-          style={{ padding: '14px 18px', borderRadius: 14 }}
-        >
+        <button className="btn-primary flex-1" onClick={copyFull}
+          style={{ padding: '14px 18px', borderRadius: 14 }}>
           {fullCopied ? <Check size={16} /> : <Copy size={16} />}
           {fullCopied ? 'Copied!' : 'Copy full note'}
         </button>
-        <button
-          className="btn-icon"
-          onClick={onNew}
-          aria-label="New session"
-          style={{ width: 48, height: 48, borderRadius: 14 }}
-        >
+        <button className="btn-icon" onClick={onNew} aria-label="New session"
+          style={{ width: 48, height: 48, borderRadius: 14 }}>
           <Plus size={18} />
         </button>
       </div>
