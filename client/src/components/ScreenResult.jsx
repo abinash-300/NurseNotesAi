@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, MoreHorizontal, Copy, Check, Edit2, Flag, Share2, Plus, X } from 'lucide-react';
 
+const vibrate = (pattern) => { try { navigator.vibrate?.(pattern); } catch {} };
+
 const CLEAR_SECS = 300; // 5 minutes
 
 const SPECIALTY_LABELS = {
@@ -61,6 +63,7 @@ function SoapCard({ section, body, index, onSave }) {
     : (body ? body.trim().split(/\s+/).length : 0);
 
   const copy = async () => {
+    vibrate(30);
     try { await navigator.clipboard.writeText(body); } catch {}
     setCopied(true);
     setTimeout(() => setCopied(false), 1600);
@@ -171,6 +174,7 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
     .join('\n\n');
 
   const copyFull = async () => {
+    vibrate(30);
     try { await navigator.clipboard.writeText(fullNote); } catch {}
     setFullCopied(true);
     setTimeout(() => setFullCopied(false), 1800);

@@ -6,6 +6,8 @@ import ScreenRecording from './components/ScreenRecording.jsx';
 import ScreenProcessing from './components/ScreenProcessing.jsx';
 import ScreenResult    from './components/ScreenResult.jsx';
 
+const vibrate = (pattern) => { try { navigator.vibrate?.(pattern); } catch {} };
+
 const DEMO_TRANSCRIPT =
   'Patient is a 68-year-old male presenting with chest tightness and shortness of breath that started about 2 hours ago. He rates the pain 6 out of 10, describes it as pressure-like, radiating to the left arm. He has a history of hypertension and type 2 diabetes. Current medications include metformin and lisinopril. He denies nausea or vomiting. Vitals on admission: blood pressure 158 over 94, heart rate 88 beats per minute, respiratory rate 20, oxygen saturation 96% on room air, temperature 98.6. Patient appears anxious but alert and oriented times 3. Lung sounds clear bilaterally, heart rhythm regular. 12-lead EKG ordered, troponin levels sent to lab. Patient placed on cardiac monitor. IV access established in right antecubital. Oxygen applied via nasal cannula at 2 liters. Nitroglycerin 0.4 mg sublingual administered per protocol. Physician notified of patient status.';
 
@@ -44,6 +46,7 @@ export default function App() {
   };
 
   const startRecording = () => {
+    vibrate(50);
     setTranscript('');
     setSoap(null);
     setMeta(null);
@@ -60,6 +63,7 @@ export default function App() {
   };
 
   const onProcessDone = (soapData, metaData) => {
+    vibrate(100);
     const id = sessionCounter;
     const enrichedMeta = { ...metaData, sessionNumber: id, createdAt: Date.now() };
     setSoap(soapData);
@@ -70,6 +74,7 @@ export default function App() {
   };
 
   const onProcessError = (msg) => {
+    vibrate([100, 50, 100]);
     showToast(msg);
     setScreen('idle');
   };

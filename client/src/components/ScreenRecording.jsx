@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Square, Pause } from 'lucide-react';
+
+const vibrate = (pattern) => { try { navigator.vibrate?.(pattern); } catch {} };
 import BrandRow from './BrandRow.jsx';
 import MicCore from './MicCore.jsx';
 import Waveform from './Waveform.jsx';
@@ -66,6 +68,7 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
   }, []);
 
   const handleStop = () => {
+    vibrate([50, 50, 50]);
     shouldContinueRef.current = false;
     try { recognitionRef.current?.stop(); } catch {}
     onStop();
