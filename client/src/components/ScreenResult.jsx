@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, MoreHorizontal, Copy, Check, Edit2, Flag, FileOutput, Plus } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, Copy, Check, Edit2, Flag, FileOutput, Plus, X } from 'lucide-react';
 
 function timeAgo(ts) {
   if (!ts) return 'JUST NOW';
@@ -34,9 +34,14 @@ function SoapRing({ letter, color }) {
   );
 }
 
-function SoapCard({ section, body, index }) {
-  const [copied, setCopied] = useState(false);
-  const words = body ? body.trim().split(/\s+/).length : 0;
+function SoapCard({ section, body, index, onSave }) {
+  const [copied,  setCopied]  = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [draft,   setDraft]   = useState('');
+
+  const words = editing
+    ? (draft.trim() ? draft.trim().split(/\s+/).length : 0)
+    : (body ? body.trim().split(/\s+/).length : 0);
 
   const copy = async () => {
     try { await navigator.clipboard.writeText(body); } catch {}
@@ -44,11 +49,26 @@ function SoapCard({ section, body, index }) {
     setTimeout(() => setCopied(false), 1600);
   };
 
+  const startEdit = () => {
+    setDraft(body);
+    setEditing(true);
+  };
+
+  const save = () => {
+    onSave(draft);
+    setEditing(false);
+  };
+
+  const cancel = () => {
+    setEditing(false);
+  };
+
   return (
     <div
       className="card-glass animate-rise-in"
       style={{ padding: '14px 16px', animationDelay: `${index * 90}ms` }}
     >
+      {/* Card header */}
       <div className="flex items-center justify-between mb-2.5">
         <div className="flex items-center gap-3">
           <SoapRing letter={section.letter} color={section.color} />
@@ -57,27 +77,88 @@ function SoapCard({ section, body, index }) {
               {section.title}
             </span>
             <span className="font-mono text-ink-4" style={{ fontSize: 10, letterSpacing: '0.08em' }}>
-              {words} WORDS
+              {words} WORDS{editing ? ' · EDITING' : ''}
             </span>
           </div>
         </div>
-        <div className="flex gap-1">
-          <button className="btn-icon" onClick={copy} aria-label="Copy">
-            {copied
-              ? <Check size={14} style={{ color: '#6ee7b7' }} />
-              : <Copy size={14} />}
+
+        {editing ? (
+          /* In edit mode: only show an X to cancel via the header */
+          <button className="btn-icon" onClick={cancel} aria-label="Cancel edit">
+            <X size={14} />
           </button>
-          <button className="btn-icon" aria-label="Edit"><Edit2 size={14} /></button>
-          <button className="btn-icon" aria-label="Flag"><Flag size={14} /></button>
-        </div>
+        ) : (
+          <div className="flex gap-1">
+            <button className="btn-icon" onClick={copy} aria-label="Copy">
+              {copied
+                ? <Check size={14} style={{ color: '#6ee7b7' }} />
+                : <Copy size={14} />}
+            </button>
+            <button
+              className="btn-icon"
+              onClick={startEdit}
+              aria-label="Edit"
+              style={{ color: '#c8d3ed' }}
+            >
+              <Edit2 size={14} />
+            </button>
+            <button className="btn-icon" aria-label="Flag"><Flag size={14} /></button>
+          </div>
+        )}
       </div>
-      <p className="m-0 text-ink-2" style={{ fontSize: 13.5, lineHeight: 1.6 }}>{body}</p>
+
+      {/* Body — read or edit */}
+      {editing ? (
+        <>
+          <textarea
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            autoFocus
+            style={{
+              display: 'block',
+              width: '100%',
+              minHeight: 96,
+              background: 'rgba(255,255,255,0.03)',
+              border: `1px solid ${section.color}44`,
+              borderRadius: 8,
+              color: '#c8d3ed',
+              fontSize: 13.5,
+              lineHeight: 1.6,
+              fontFamily: 'Sora, system-ui, sans-serif',
+              padding: '9px 11px',
+              resize: 'vertical',
+              outline: 'none',
+              boxSizing: 'border-box',
+            }}
+          />
+          <div className="flex gap-2 mt-2.5">
+            <button
+              className="btn-ghost"
+              onClick={cancel}
+              style={{ flex: 1, padding: '7px 10px', fontSize: 12, borderRadius: 8 }}
+            >
+              Cancel
+            </button>
+            <button
+              className="btn-primary"
+              onClick={save}
+              style={{ flex: 2, padding: '7px 10px', fontSize: 12, borderRadius: 8 }}
+            >
+              <Check size={13} />
+              Save
+            </button>
+          </div>
+        </>
+      ) : (
+        <p className="m-0 text-ink-2" style={{ fontSize: 13.5, lineHeight: 1.6 }}>{body}</p>
+      )}
     </div>
   );
 }
 
 export default function ScreenResult({ soap, meta, onNew }) {
   const [fullCopied, setFullCopied] = useState(false);
+  const [editedSoap, setEditedSoap] = useState(() => ({ ...soap }));
   const [, forceUpdate] = useState(0);
 
   // Re-render every 15s so the "X mins ago" timestamp stays fresh
@@ -86,8 +167,13 @@ export default function ScreenResult({ soap, meta, onNew }) {
     return () => clearInterval(t);
   }, []);
 
+  const updateSection = (key, text) => {
+    setEditedSoap((prev) => ({ ...prev, [key]: text }));
+  };
+
+  // fullNote always uses the latest edited text
   const fullNote = SOAP_META
-    .map((s) => `${s.title.toUpperCase()}:\n${soap[s.key] ?? ''}`)
+    .map((s) => `${s.title.toUpperCase()}:\n${editedSoap[s.key] ?? ''}`)
     .join('\n\n');
 
   const copyFull = async () => {
@@ -99,7 +185,6 @@ export default function ScreenResult({ soap, meta, onNew }) {
   const secs          = ((meta?.ms ?? 0) / 1000).toFixed(2);
   const wordsIn       = meta?.wordsIn       ?? 0;
   const wordsOut      = meta?.wordsOut      ?? 0;
-  const model         = meta?.model         ?? 'llama-3.1-8b-instant';
   const sessionNumber = meta?.sessionNumber ?? '—';
   const timestamp     = timeAgo(meta?.createdAt);
 
@@ -138,8 +223,9 @@ export default function ScreenResult({ soap, meta, onNew }) {
           <SoapCard
             key={s.key}
             section={s}
-            body={soap[s.key] ?? '(not generated)'}
+            body={editedSoap[s.key] ?? '(not generated)'}
             index={i}
+            onSave={(text) => updateSection(s.key, text)}
           />
         ))}
 
@@ -149,16 +235,16 @@ export default function ScreenResult({ soap, meta, onNew }) {
           style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--navy-border)' }}
         >
           {[
-            { label: 'GENERATED IN', value: `${secs}s`,          mono: true  },
-            { label: 'MODEL',        value: 'llama-3.1-8b',       mono: true  },
-            { label: 'CONFIDENCE',   value: 'HIGH · 94%',         green: true },
-            { label: 'WORDS IN / OUT', value: `${wordsIn} / ${wordsOut}`, mono: true },
-          ].map(({ label, value, green, mono }) => (
+            { label: 'GENERATED IN',    value: `${secs}s`,                    mono: true  },
+            { label: 'MODEL',           value: 'llama-3.1-8b',                 mono: true  },
+            { label: 'CONFIDENCE',      value: 'HIGH · 94%',                   green: true },
+            { label: 'WORDS IN / OUT',  value: `${wordsIn} / ${wordsOut}`,     mono: true  },
+          ].map(({ label, value, green }) => (
             <div key={label} className="flex flex-col gap-0.5">
               <span className="eyebrow" style={{ fontSize: 9 }}>{label}</span>
               <span
-                className={`font-mono tabular-nums ${green ? '' : 'text-ink-1'}`}
-                style={{ fontSize: 13, color: green ? '#6ee7b7' : undefined }}
+                className="font-mono tabular-nums"
+                style={{ fontSize: 13, color: green ? '#6ee7b7' : '#f4f7ff' }}
               >
                 {value}
               </span>
