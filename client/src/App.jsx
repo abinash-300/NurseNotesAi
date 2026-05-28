@@ -10,11 +10,13 @@ const DEMO_TRANSCRIPT =
 // State machine: idle → recording → processing → result
 //                                  ↑ (demo shortcut)
 export default function App() {
-  const [screen,     setScreen]     = useState('idle');
-  const [transcript, setTranscript] = useState('');
-  const [soap,       setSoap]       = useState(null);
-  const [meta,       setMeta]       = useState(null);
-  const [toast,      setToast]      = useState('');
+  const [screen,         setScreen]         = useState('idle');
+  const [transcript,     setTranscript]     = useState('');
+  const [soap,           setSoap]           = useState(null);
+  const [meta,           setMeta]           = useState(null);
+  const [toast,          setToast]          = useState('');
+  const [sessions,       setSessions]       = useState([]);
+  const [sessionCounter, setSessionCounter] = useState(1001);
 
   const showToast = (msg) => {
     setToast(msg);
@@ -38,8 +40,12 @@ export default function App() {
   };
 
   const onProcessDone = (soapData, metaData) => {
+    const id = sessionCounter;
+    const enrichedMeta = { ...metaData, sessionNumber: id, createdAt: Date.now() };
     setSoap(soapData);
-    setMeta(metaData);
+    setMeta(enrichedMeta);
+    setSessions((prev) => [{ id, soap: soapData, meta: enrichedMeta }, ...prev].slice(0, 5));
+    setSessionCounter((n) => n + 1);
     setScreen('result');
   };
 
@@ -53,6 +59,12 @@ export default function App() {
     setSoap(null);
     setMeta(null);
     setScreen('idle');
+  };
+
+  const openSession = (session) => {
+    setSoap(session.soap);
+    setMeta(session.meta);
+    setScreen('result');
   };
 
   return (
@@ -73,7 +85,7 @@ export default function App() {
       )}
 
       {screen === 'idle' && (
-        <ScreenIdle onStart={startRecording} onDemo={loadDemo} />
+        <ScreenIdle onStart={startRecording} onDemo={loadDemo} sessions={sessions} onOpenSession={openSession} />
       )}
       {screen === 'recording' && (
         <ScreenRecording

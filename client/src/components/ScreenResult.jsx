@@ -1,5 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, MoreHorizontal, Copy, Check, Edit2, Flag, FileOutput, Plus } from 'lucide-react';
+
+function timeAgo(ts) {
+  if (!ts) return 'JUST NOW';
+  const secs = Math.floor((Date.now() - ts) / 1000);
+  if (secs < 10)   return 'JUST NOW';
+  if (secs < 60)   return `${secs}S AGO`;
+  if (secs < 3600) return `${Math.floor(secs / 60)} MIN AGO`;
+  return `${Math.floor(secs / 3600)}H AGO`;
+}
 
 const SOAP_META = [
   { key: 'subjective', letter: 'S', title: 'Subjective', color: '#fb923c' },
@@ -69,6 +78,13 @@ function SoapCard({ section, body, index }) {
 
 export default function ScreenResult({ soap, meta, onNew }) {
   const [fullCopied, setFullCopied] = useState(false);
+  const [, forceUpdate] = useState(0);
+
+  // Re-render every 15s so the "X mins ago" timestamp stays fresh
+  useEffect(() => {
+    const t = setInterval(() => forceUpdate((n) => n + 1), 15_000);
+    return () => clearInterval(t);
+  }, []);
 
   const fullNote = SOAP_META
     .map((s) => `${s.title.toUpperCase()}:\n${soap[s.key] ?? ''}`)
@@ -80,10 +96,12 @@ export default function ScreenResult({ soap, meta, onNew }) {
     setTimeout(() => setFullCopied(false), 1800);
   };
 
-  const secs     = ((meta?.ms ?? 0) / 1000).toFixed(2);
-  const wordsIn  = meta?.wordsIn  ?? 0;
-  const wordsOut = meta?.wordsOut ?? 0;
-  const model    = meta?.model    ?? 'llama-3.1-8b-instant';
+  const secs          = ((meta?.ms ?? 0) / 1000).toFixed(2);
+  const wordsIn       = meta?.wordsIn       ?? 0;
+  const wordsOut      = meta?.wordsOut      ?? 0;
+  const model         = meta?.model         ?? 'llama-3.1-8b-instant';
+  const sessionNumber = meta?.sessionNumber ?? '—';
+  const timestamp     = timeAgo(meta?.createdAt);
 
   return (
     <div className="screen">
@@ -94,10 +112,10 @@ export default function ScreenResult({ soap, meta, onNew }) {
         </button>
         <div className="flex flex-col items-center" style={{ lineHeight: 1.15 }}>
           <span className="text-ink-1 font-semibold" style={{ fontSize: 13.5 }}>
-            Session #1041
+            Session #{sessionNumber}
           </span>
           <span className="font-mono text-ink-4" style={{ fontSize: 10, letterSpacing: '0.08em' }}>
-            JUST NOW · {wordsIn} WORDS IN
+            {timestamp} · {wordsIn} WORDS IN
           </span>
         </div>
         <button className="btn-icon" aria-label="More"><MoreHorizontal size={16} /></button>
