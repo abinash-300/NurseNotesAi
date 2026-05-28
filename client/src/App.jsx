@@ -105,7 +105,7 @@ export default function App() {
         />
       )}
       {screen === 'result' && (
-        <ScreenResult soap={soap} meta={meta} onNew={newSession} />
+        <ScreenResult soap={soap} meta={meta} onNew={newSession} showToast={showToast} />
       )}
     </>
   );

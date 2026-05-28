@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, MoreHorizontal, Copy, Check, Edit2, Flag, FileOutput, Plus, X } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, Copy, Check, Edit2, Flag, Share2, Plus, X } from 'lucide-react';
 
 const SPECIALTY_LABELS = {
   general: 'General', icu: 'ICU', er: 'ER',
@@ -161,7 +161,7 @@ function SoapCard({ section, body, index, onSave }) {
   );
 }
 
-export default function ScreenResult({ soap, meta, onNew }) {
+export default function ScreenResult({ soap, meta, onNew, showToast }) {
   const [fullCopied, setFullCopied] = useState(false);
   const [editedSoap, setEditedSoap] = useState(() => ({ ...soap }));
   const [, forceUpdate] = useState(0);
@@ -185,6 +185,20 @@ export default function ScreenResult({ soap, meta, onNew }) {
     try { await navigator.clipboard.writeText(fullNote); } catch {}
     setFullCopied(true);
     setTimeout(() => setFullCopied(false), 1800);
+  };
+
+  const handleShare = async () => {
+    const title = `NurseNote AI — Session #${sessionNumber}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text: fullNote });
+      } catch (err) {
+        if (err.name !== 'AbortError') showToast?.('Share failed. Try the copy button instead.');
+      }
+    } else {
+      try { await navigator.clipboard.writeText(fullNote); } catch {}
+      showToast?.('Copied to clipboard');
+    }
   };
 
   const secs            = ((meta?.ms ?? 0) / 1000).toFixed(2);
@@ -278,10 +292,11 @@ export default function ScreenResult({ soap, meta, onNew }) {
       >
         <button
           className="btn-icon"
-          aria-label="Save to EHR"
+          onClick={handleShare}
+          aria-label="Share note"
           style={{ width: 48, height: 48, borderRadius: 14 }}
         >
-          <FileOutput size={18} />
+          <Share2 size={18} />
         </button>
         <button
           className="btn-primary flex-1"
