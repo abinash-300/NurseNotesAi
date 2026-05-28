@@ -151,12 +151,27 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
           </div>
 
           {sessions.length === 0 ? (
-            <p
-              className="text-center font-mono text-ink-5 m-0"
-              style={{ fontSize: 11, letterSpacing: '0.06em', padding: '10px 0' }}
-            >
-              No notes yet — start a session
-            </p>
+            <div className="flex flex-col items-center gap-2" style={{ padding: '16px 0 10px' }}>
+              <div
+                style={{
+                  width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                  background: 'rgba(34,211,238,0.05)',
+                  border: '1px solid rgba(34,211,238,0.10)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#3f4a6e',
+                }}
+              >
+                <Activity size={16} />
+              </div>
+              <div className="text-center flex flex-col gap-1">
+                <span className="text-ink-4" style={{ fontSize: 13, letterSpacing: '-0.01em' }}>
+                  Your recent notes appear here
+                </span>
+                <span className="font-mono text-ink-5" style={{ fontSize: 10, letterSpacing: '0.06em' }}>
+                  NOTES ARE KEPT FOR THIS SESSION ONLY
+                </span>
+              </div>
+            </div>
           ) : (
             sessions.map((session, i) => (
               <div
