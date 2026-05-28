@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ScreenOnboarding from './components/ScreenOnboarding.jsx';
 import ScreenIdle      from './components/ScreenIdle.jsx';
 import ScreenRecording from './components/ScreenRecording.jsx';
 import ScreenProcessing from './components/ScreenProcessing.jsx';
@@ -10,6 +11,14 @@ const DEMO_TRANSCRIPT =
 // State machine: idle → recording → processing → result
 //                                  ↑ (demo shortcut)
 export default function App() {
+  const [onboarded, setOnboarded] = useState(
+    () => !!localStorage.getItem('nursenote_onboarded'),
+  );
+  const completeOnboarding = () => {
+    localStorage.setItem('nursenote_onboarded', '1');
+    setOnboarded(true);
+  };
+
   const [screen,         setScreen]         = useState('idle');
   const [transcript,     setTranscript]     = useState('');
   const [soap,           setSoap]           = useState(null);
@@ -67,6 +76,10 @@ export default function App() {
     setMeta(session.meta);
     setScreen('result');
   };
+
+  if (!onboarded) {
+    return <ScreenOnboarding onComplete={completeOnboarding} />;
+  }
 
   return (
     <>
