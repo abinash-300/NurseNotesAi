@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import DisclaimerModal  from './components/DisclaimerModal.jsx';
 import ScreenOnboarding from './components/ScreenOnboarding.jsx';
 import ScreenIdle      from './components/ScreenIdle.jsx';
 import ScreenRecording from './components/ScreenRecording.jsx';
@@ -11,6 +12,14 @@ const DEMO_TRANSCRIPT =
 // State machine: idle → recording → processing → result
 //                                  ↑ (demo shortcut)
 export default function App() {
+  const [disclaimerAccepted, setDisclaimerAccepted] = useState(
+    () => !!localStorage.getItem('nursenote_disclaimer_accepted'),
+  );
+  const acceptDisclaimer = () => {
+    localStorage.setItem('nursenote_disclaimer_accepted', '1');
+    setDisclaimerAccepted(true);
+  };
+
   const [onboarded, setOnboarded] = useState(
     () => !!localStorage.getItem('nursenote_onboarded'),
   );
@@ -76,6 +85,10 @@ export default function App() {
     setMeta(session.meta);
     setScreen('result');
   };
+
+  if (!disclaimerAccepted) {
+    return <DisclaimerModal onAccept={acceptDisclaimer} />;
+  }
 
   if (!onboarded) {
     return <ScreenOnboarding onComplete={completeOnboarding} />;
