@@ -10,7 +10,7 @@ function fmtTime(s) {
   return `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`;
 }
 
-export default function ScreenRecording({ transcript, setTranscript, onStop, onCancel }) {
+export default function ScreenRecording({ transcript, setTranscript, onStop, onCancel, showToast }) {
   const [seconds,   setSeconds]   = useState(0);
   const [interim,   setInterim]   = useState('');
   const [recError,  setRecError]  = useState('');
@@ -67,16 +67,20 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
     return () => clearInterval(t);
   }, []);
 
+  const fullText  = (transcript || '') + (interim ? ' ' + interim : '');
+  const lines     = fullText.replace(/\s+/g, ' ').split(/(?<=[.!?])\s+/).filter(Boolean);
+  const wordCount = fullText.trim() ? fullText.trim().split(/\s+/).length : 0;
+
   const handleStop = () => {
+    if (wordCount === 0 && !recError) {
+      showToast?.('No speech detected. Try again or use the demo patient button.');
+      return;
+    }
     vibrate([50, 50, 50]);
     shouldContinueRef.current = false;
     try { recognitionRef.current?.stop(); } catch {}
     onStop();
   };
-
-  const fullText  = (transcript || '') + (interim ? ' ' + interim : '');
-  const lines     = fullText.replace(/\s+/g, ' ').split(/(?<=[.!?])\s+/).filter(Boolean);
-  const wordCount = fullText.trim() ? fullText.trim().split(/\s+/).length : 0;
 
   return (
     <div className="screen">

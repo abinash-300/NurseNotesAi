@@ -98,6 +98,11 @@ export default function ScreenProcessing({ transcript, specialty = 'general', no
   // Real API call
   useEffect(() => {
     let cancelled = false;
+    const words = transcript.trim().split(/\s+/).filter(Boolean);
+    if (words.length < 5) {
+      onError('Transcript too short. Please record at least a few words or use the demo patient button.');
+      return;
+    }
     const systemPrompt = buildPrompt(specialty, noteLength);
     (async () => {
       try {

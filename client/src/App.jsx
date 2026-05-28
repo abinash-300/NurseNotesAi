@@ -126,6 +126,7 @@ export default function App() {
           setTranscript={setTranscript}
           onStop={stopAndProcess}
           onCancel={newSession}
+          showToast={showToast}
         />
       )}
       {screen === 'processing' && (
