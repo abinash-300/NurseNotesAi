@@ -4,10 +4,10 @@
 
 @layer base {
   :root {
-    --navy-border:        rgba(120, 160, 255, 0.08);
-    --navy-border-strong: rgba(120, 180, 255, 0.16);
-    --edge-highlight:     inset 0 1px 0 rgba(255,255,255,0.04), inset 0 -1px 0 rgba(0,0,0,0.40);
-    --glow-cyan-md:       0 0 0 1px rgba(34,211,238,0.30), 0 8px 32px rgba(34,211,238,0.22);
+    --navy-border:        rgba(0, 212, 255, 0.08);
+    --navy-border-strong: rgba(0, 212, 255, 0.16);
+    --edge-highlight:     inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.40);
+    --glow-cyan-md:       0 0 0 1px rgba(0,212,255,0.30), 0 8px 32px rgba(0,212,255,0.22);
   }
 
   *, *::before, *::after { box-sizing: border-box; }
@@ -26,7 +26,6 @@
     overscroll-behavior: none;
   }
 
-  /* wave-bar uses scaleY — needs a raw @keyframes outside Tailwind's keyframe map */
   @keyframes wave-bar {
     0%, 100% { transform: scaleY(0.22); }
     50%       { transform: scaleY(1); }
@@ -36,51 +35,50 @@
 @layer components {
   /* ── Screen shell ────────────────────────────────── */
   .screen {
-    @apply relative flex flex-col bg-navy-950 overflow-hidden;
+    @apply relative flex flex-col overflow-hidden;
     min-height: 100vh;
     min-height: 100dvh;
-    background-image:
-      radial-gradient(60% 50% at 50% 30%, rgba(34,211,238,0.10), transparent 70%),
-      radial-gradient(40% 30% at 50% 70%, rgba(99,102,241,0.06), transparent 70%);
+    background: linear-gradient(135deg, #02050e 0%, #040d1a 50%, #020818 100%);
   }
   .screen::before {
     content: '';
     @apply absolute inset-0 pointer-events-none z-0;
-    background-image: radial-gradient(rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(255,255,255,0.012) 1px, transparent 1px);
     background-size: 3px 3px;
     mix-blend-mode: overlay;
-    opacity: 0.6;
+    opacity: 0.5;
   }
 
   /* ── Cards ──────────────────────────────────────── */
   .card-glass {
-    background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01));
-    border: 1px solid var(--navy-border);
-    border-radius: 18px;
-    box-shadow: var(--edge-highlight);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(8,16,42,0.80);
+    border: 1px solid rgba(0,212,255,0.08);
+    border-radius: 20px;
+    box-shadow: var(--edge-highlight), 0 4px 24px rgba(0,0,0,0.30);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
   .card-solid {
-    background: #08102a;
-    border: 1px solid var(--navy-border);
+    background: #060e1a;
+    border: 1px solid rgba(0,212,255,0.07);
     border-radius: 18px;
     box-shadow: var(--edge-highlight);
   }
 
   /* ── Chips ──────────────────────────────────────── */
   .chip {
-    @apply inline-flex items-center gap-1.5 rounded-full font-mono text-ink-3 flex-shrink-0;
+    @apply inline-flex items-center gap-1.5 rounded-full font-mono flex-shrink-0;
     padding: 5px 10px;
     font-size: 10.5px;
     letter-spacing: 0.06em;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--navy-border);
+    background: rgba(10,22,40,0.9);
+    border: 1px solid #0d2137;
+    color: #2a5f7a;
   }
   .chip.chip-live {
-    background: rgba(34,211,238,0.08);
-    border-color: rgba(34,211,238,0.25);
-    @apply text-cyan-300;
+    background: rgba(0,212,255,0.08);
+    border-color: rgba(0,212,255,0.25);
+    color: #00d4ff;
   }
   .chip.chip-rec {
     background: rgba(248,113,113,0.10);
@@ -88,9 +86,9 @@
     color: #fca5a5;
   }
   .chip.chip-ok {
-    background: rgba(52,211,153,0.08);
-    border-color: rgba(52,211,153,0.25);
-    color: #6ee7b7;
+    background: rgba(0,255,170,0.08);
+    border-color: rgba(0,255,170,0.30);
+    color: #00ffaa;
   }
 
   /* ── Status dot ─────────────────────────────────── */
@@ -110,27 +108,34 @@
     border-radius: 14px;
     font-size: 15px;
     color: #03101a;
-    background: linear-gradient(180deg, #67e8f9 0%, #06b6d4 100%);
-    box-shadow: var(--glow-cyan-md);
+    background: linear-gradient(180deg, #00e5ff 0%, #00a8cc 100%);
+    box-shadow: 0 0 0 1px rgba(0,212,255,0.30), 0 8px 32px rgba(0,212,255,0.30);
     border: none;
     -webkit-tap-highlight-color: transparent;
   }
-  .btn-primary:hover  { box-shadow: 0 0 0 1px rgba(34,211,238,0.40), 0 16px 64px rgba(34,211,238,0.30); }
+  .btn-primary:hover {
+    background: linear-gradient(180deg, #33eeff 0%, #00c4e8 100%);
+    box-shadow: 0 0 0 1px rgba(0,212,255,0.50), 0 12px 40px rgba(0,212,255,0.40);
+  }
   .btn-primary:active { transform: translateY(1px); }
-  .btn-primary:disabled { opacity: 0.5; box-shadow: none; cursor: not-allowed; transform: none; }
+  .btn-primary:disabled { opacity: 0.4; box-shadow: none; cursor: not-allowed; transform: none; }
 
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2 font-sans font-medium
            cursor-pointer transition-all duration-200 select-none;
     padding: 12px 18px;
     border-radius: 12px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--navy-border-strong);
-    color: #c8d3ed;
+    background: rgba(0,212,255,0.04);
+    border: 1px solid #0d2a3a;
+    color: #00d4ff;
     font-size: 14px;
     -webkit-tap-highlight-color: transparent;
   }
-  .btn-ghost:hover { background: rgba(255,255,255,0.06); color: #f4f7ff; }
+  .btn-ghost:hover {
+    background: rgba(0,212,255,0.09);
+    border-color: rgba(0,212,255,0.50);
+    color: #00e5ff;
+  }
 
   .btn-icon {
     @apply inline-flex items-center justify-center cursor-pointer
@@ -138,28 +143,33 @@
     width: 36px;
     height: 36px;
     border-radius: 10px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--navy-border);
-    color: #8a99c2;
+    background: rgba(0,212,255,0.04);
+    border: 1px solid rgba(0,212,255,0.10);
+    color: #2a5f7a;
     -webkit-tap-highlight-color: transparent;
   }
-  .btn-icon:hover { background: rgba(255,255,255,0.07); color: #f4f7ff; border-color: var(--navy-border-strong); }
+  .btn-icon:hover {
+    background: rgba(0,212,255,0.09);
+    color: #00d4ff;
+    border-color: rgba(0,212,255,0.30);
+  }
 
   /* ── Typography helpers ─────────────────────────── */
   .eyebrow {
-    @apply font-mono uppercase text-ink-4;
+    @apply font-mono uppercase;
     font-size: 10px;
     letter-spacing: 0.18em;
     font-weight: 500;
+    color: #2a5f7a;
   }
   .eyebrow-red  { color: #f87171; }
-  .eyebrow-cyan { @apply text-cyan-400; }
+  .eyebrow-cyan { color: #00d4ff; }
 
   /* ── Scrollbar ───────────────────────────────────── */
   .scroll-thin::-webkit-scrollbar { width: 4px; }
   .scroll-thin::-webkit-scrollbar-thumb {
-    background: var(--navy-border-strong);
+    background: rgba(0,212,255,0.15);
     border-radius: 4px;
   }
-  .scroll-thin { scrollbar-width: thin; scrollbar-color: var(--navy-border-strong) transparent; }
+  .scroll-thin { scrollbar-width: thin; scrollbar-color: rgba(0,212,255,0.15) transparent; }
 }

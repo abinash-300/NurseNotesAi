@@ -32,10 +32,10 @@ function SpecialtyRow({ specialty, onChange }) {
               borderRadius: 99,
               fontSize: 11,
               letterSpacing: '0.04em',
-              border: `1px solid ${active ? 'rgba(34,211,238,0.45)' : 'var(--navy-border)'}`,
-              background: active ? 'rgba(34,211,238,0.10)' : 'rgba(255,255,255,0.02)',
-              color: active ? '#22d3ee' : '#5f6e96',
-              boxShadow: active ? '0 0 10px rgba(34,211,238,0.18)' : 'none',
+              border: `1px solid ${active ? '#00d4ff' : '#0d2137'}`,
+              background: active ? 'rgba(0,212,255,0.12)' : '#0a1628',
+              color: active ? '#00d4ff' : '#2a5f7a',
+              boxShadow: active ? '0 0 12px rgba(0,212,255,0.30)' : 'none',
               transition: 'all 180ms ease',
               cursor: 'pointer',
               WebkitTapHighlightColor: 'transparent',
@@ -64,8 +64,8 @@ function NoteLengthControl({ noteLength, onChange }) {
       <div
         style={{
           display: 'flex',
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid var(--navy-border)',
+          background: '#060e1a',
+          border: '1px solid #0d2137',
           borderRadius: 10,
           padding: 3,
         }}
@@ -81,11 +81,11 @@ function NoteLengthControl({ noteLength, onChange }) {
                 padding: '7px 4px',
                 borderRadius: 7,
                 fontSize: 12,
-                fontWeight: active ? 500 : 400,
+                fontWeight: active ? 600 : 400,
                 fontFamily: 'Sora, system-ui, sans-serif',
-                border: `1px solid ${active ? 'rgba(34,211,238,0.30)' : 'transparent'}`,
-                background: active ? 'rgba(34,211,238,0.10)' : 'transparent',
-                color: active ? '#22d3ee' : '#5f6e96',
+                border: `1px solid ${active ? 'rgba(0,212,255,0.30)' : 'transparent'}`,
+                background: active ? 'rgba(0,212,255,0.10)' : 'transparent',
+                color: active ? '#00d4ff' : '#1a3a4a',
                 cursor: 'pointer',
                 transition: 'all 160ms ease',
                 WebkitTapHighlightColor: 'transparent',
@@ -122,17 +122,30 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
       {speechSupported ? (
         /* ── Normal hero ── */
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center gap-6 px-6 pt-2">
-          <span className="eyebrow" style={{ fontSize: 9.5 }}>
+          <span className="eyebrow" style={{ fontSize: 9.5, color: '#1e3a4a' }}>
             READY · SESSION {1000 + sessions.length + 1}
           </span>
 
-          <MicCore onTap={onStart} size={144} />
+          {/* Ambient glow behind mic orb */}
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div
+              style={{
+                position: 'absolute',
+                width: 220,
+                height: 220,
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(0,212,255,0.12) 0%, rgba(0,212,255,0.04) 50%, transparent 70%)',
+                pointerEvents: 'none',
+              }}
+            />
+            <MicCore onTap={onStart} size={144} />
+          </div>
 
           <div className="text-center flex flex-col gap-1.5">
-            <span className="text-ink-1 font-semibold" style={{ fontSize: 22, letterSpacing: '-0.015em' }}>
+            <span style={{ fontSize: '1.6rem', fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1.15 }}>
               Press to begin
             </span>
-            <span className="text-ink-3" style={{ fontSize: 13.5, lineHeight: 1.45 }}>
+            <span style={{ fontSize: 13.5, color: '#4a90a4', lineHeight: 1.45 }}>
               Speak the patient report.<br />SOAP note generated in seconds.
             </span>
           </div>
@@ -208,10 +221,10 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
               <div
                 style={{
                   width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                  background: 'rgba(34,211,238,0.05)',
-                  border: '1px solid rgba(34,211,238,0.10)',
+                  background: '#0a1628',
+                  border: '1px solid rgba(0,212,255,0.10)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: '#3f4a6e',
+                  color: 'rgba(0,212,255,0.30)',
                 }}
               >
                 <Activity size={16} />
@@ -235,11 +248,12 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
               >
                 <div className="flex items-center gap-2.5">
                   <div
-                    className="flex items-center justify-center text-cyan-400 rounded-[8px] flex-shrink-0"
+                    className="flex items-center justify-center rounded-[8px] flex-shrink-0"
                     style={{
                       width: 28, height: 28,
-                      background: 'rgba(34,211,238,0.06)',
-                      border: '1px solid rgba(34,211,238,0.15)',
+                      background: 'rgba(0,212,255,0.06)',
+                      border: '1px solid rgba(0,212,255,0.15)',
+                      color: '#00d4ff',
                     }}
                   >
                     <Activity size={14} />
@@ -264,8 +278,8 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
 
       {/* Trust footer */}
       <div className="relative z-10 flex items-center justify-center gap-2 py-3">
-        <Lock size={11} className="text-ink-5" />
-        <span className="font-mono text-ink-5 uppercase" style={{ fontSize: 10, letterSpacing: '0.12em' }}>
+        <Lock size={11} style={{ color: '#0d2a3a' }} />
+        <span className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.12em', color: '#0d2a3a' }}>
           End-to-end encrypted · Nothing stored
         </span>
       </div>
