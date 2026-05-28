@@ -49,6 +49,57 @@ function SpecialtyRow({ specialty, onChange }) {
   );
 }
 
+const NOTE_LENGTH_OPTIONS = [
+  { key: 'brief',    label: 'Brief'    },
+  { key: 'standard', label: 'Standard' },
+  { key: 'detailed', label: 'Detailed' },
+];
+
+function NoteLengthControl({ noteLength, onChange }) {
+  return (
+    <div className="w-full flex flex-col gap-1.5">
+      <span className="eyebrow" style={{ fontSize: 9, letterSpacing: '0.10em', paddingLeft: 2 }}>
+        NOTE LENGTH
+      </span>
+      <div
+        style={{
+          display: 'flex',
+          background: 'rgba(255,255,255,0.03)',
+          border: '1px solid var(--navy-border)',
+          borderRadius: 10,
+          padding: 3,
+        }}
+      >
+        {NOTE_LENGTH_OPTIONS.map((opt) => {
+          const active = noteLength === opt.key;
+          return (
+            <button
+              key={opt.key}
+              onClick={() => onChange(opt.key)}
+              style={{
+                flex: 1,
+                padding: '7px 4px',
+                borderRadius: 7,
+                fontSize: 12,
+                fontWeight: active ? 500 : 400,
+                fontFamily: 'Sora, system-ui, sans-serif',
+                border: `1px solid ${active ? 'rgba(34,211,238,0.30)' : 'transparent'}`,
+                background: active ? 'rgba(34,211,238,0.10)' : 'transparent',
+                color: active ? '#22d3ee' : '#5f6e96',
+                cursor: 'pointer',
+                transition: 'all 160ms ease',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function timeAgo(ts) {
   const secs = Math.floor((Date.now() - ts) / 1000);
   if (secs < 10)   return 'Just now';
@@ -63,7 +114,7 @@ function subjectivePreview(text) {
   return words.slice(0, 7).join(' ') + (words.length > 7 ? '…' : '');
 }
 
-export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSession, specialty = 'general', onSpecialtyChange }) {
+export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSession, specialty = 'general', onSpecialtyChange, noteLength = 'standard', onNoteLengthChange }) {
   return (
     <div className="screen">
       <BrandRow state="idle" />
@@ -87,6 +138,7 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
           </div>
 
           <SpecialtyRow specialty={specialty} onChange={onSpecialtyChange} />
+          <NoteLengthControl noteLength={noteLength} onChange={onNoteLengthChange} />
 
           <button className="btn-ghost" onClick={onDemo} style={{ padding: '10px 16px' }}>
             <Zap size={14} />
@@ -123,6 +175,7 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
           </div>
 
           <SpecialtyRow specialty={specialty} onChange={onSpecialtyChange} />
+          <NoteLengthControl noteLength={noteLength} onChange={onNoteLengthChange} />
 
           <div className="w-full flex flex-col gap-3">
             <button

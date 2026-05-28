@@ -36,6 +36,7 @@ export default function App() {
   const [sessions,       setSessions]       = useState([]);
   const [sessionCounter, setSessionCounter] = useState(1001);
   const [specialty,      setSpecialty]      = useState('general');
+  const [noteLength,     setNoteLength]     = useState('standard');
 
   const showToast = (msg) => {
     setToast(msg);
@@ -112,7 +113,7 @@ export default function App() {
       )}
 
       {screen === 'idle' && (
-        <ScreenIdle onStart={startRecording} onDemo={loadDemo} sessions={sessions} onOpenSession={openSession} specialty={specialty} onSpecialtyChange={setSpecialty} />
+        <ScreenIdle onStart={startRecording} onDemo={loadDemo} sessions={sessions} onOpenSession={openSession} specialty={specialty} onSpecialtyChange={setSpecialty} noteLength={noteLength} onNoteLengthChange={setNoteLength} />
       )}
       {screen === 'recording' && (
         <ScreenRecording
@@ -126,6 +127,7 @@ export default function App() {
         <ScreenProcessing
           transcript={transcript}
           specialty={specialty}
+          noteLength={noteLength}
           onDone={onProcessDone}
           onError={onProcessError}
         />

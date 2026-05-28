@@ -8,6 +8,10 @@ const SPECIALTY_LABELS = {
   medsurg: 'Med-Surg', pediatrics: 'Pediatrics', cardiac: 'Cardiac',
 };
 
+const LENGTH_LABELS = {
+  brief: 'Brief', standard: 'Standard', detailed: 'Detailed',
+};
+
 function timeAgo(ts) {
   if (!ts) return 'JUST NOW';
   const secs = Math.floor((Date.now() - ts) / 1000);
@@ -191,7 +195,8 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
   const wordsOut       = meta?.wordsOut      ?? 0;
   const sessionNumber  = meta?.sessionNumber ?? '—';
   const timestamp      = timeAgo(meta?.createdAt);
-  const specialtyLabel = SPECIALTY_LABELS[meta?.specialty] ?? 'General';
+  const specialtyLabel = SPECIALTY_LABELS[meta?.specialty]  ?? 'General';
+  const lengthLabel    = LENGTH_LABELS[meta?.noteLength]    ?? 'Standard';
 
   return (
     <div className="screen">
@@ -267,6 +272,16 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
           }}
         >
           {specialtyLabel}
+        </span>
+        <span
+          className="chip"
+          style={{
+            background: 'rgba(192,132,252,0.08)',
+            border: '1px solid rgba(192,132,252,0.25)',
+            color: '#c084fc',
+          }}
+        >
+          {lengthLabel}
         </span>
         <span className="chip">2h ago</span>
         <span className="chip chip-ok"><span className="dot" />Vitals captured</span>

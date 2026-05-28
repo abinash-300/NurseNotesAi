@@ -23,6 +23,16 @@ const SPECIALTY_LABELS = {
   medsurg: 'Med-Surg', pediatrics: 'Pediatrics', cardiac: 'Cardiac',
 };
 
+const LENGTH_ADDONS = {
+  brief:    'Format: Be concise. Use bullet points where appropriate. Keep each section to 1-2 sentences maximum.',
+  standard: '',
+  detailed: 'Format: Be comprehensive. Include clinical reasoning and potential differentials in the assessment section. Provide detailed rationale for each item in the plan. Target 4-6 sentences per section.',
+};
+
+const LENGTH_LABELS = {
+  brief: 'Brief', standard: 'Standard', detailed: 'Detailed',
+};
+
 const MODEL = 'llama-3.1-8b-instant';
 
 const SOAP_META = [
@@ -32,9 +42,13 @@ const SOAP_META = [
   { key: 'plan',       letter: 'P', title: 'Plan',       color: '#34d399' },
 ];
 
-function buildPrompt(specialty) {
-  const addon = SPECIALTY_ADDONS[specialty] ?? '';
-  return addon ? `${BASE_PROMPT}\n\n${addon}` : BASE_PROMPT;
+function buildPrompt(specialty, noteLength) {
+  const parts = [BASE_PROMPT];
+  const specialtyAddon = SPECIALTY_ADDONS[specialty] ?? '';
+  const lengthAddon    = LENGTH_ADDONS[noteLength]    ?? '';
+  if (specialtyAddon) parts.push(specialtyAddon);
+  if (lengthAddon)    parts.push(lengthAddon);
+  return parts.join('\n\n');
 }
 
 async function callGroq(transcript, systemPrompt) {
@@ -60,12 +74,13 @@ async function callGroq(transcript, systemPrompt) {
   return JSON.parse(text);
 }
 
-export default function ScreenProcessing({ transcript, specialty = 'general', onDone, onError }) {
+export default function ScreenProcessing({ transcript, specialty = 'general', noteLength = 'standard', onDone, onError }) {
   const [step, setStep] = useState(0);
   const [tick, setTick] = useState(0);
   const startedAt = useRef(Date.now());
 
-  const specialtyLabel = SPECIALTY_LABELS[specialty] ?? 'General';
+  const specialtyLabel = SPECIALTY_LABELS[specialty]  ?? 'General';
+  const lengthLabel    = LENGTH_LABELS[noteLength]     ?? 'Standard';
 
   // Cosmetic pipeline — one step every 550 ms
   useEffect(() => {
@@ -83,18 +98,19 @@ export default function ScreenProcessing({ transcript, specialty = 'general', on
   // Real API call
   useEffect(() => {
     let cancelled = false;
-    const systemPrompt = buildPrompt(specialty);
+    const systemPrompt = buildPrompt(specialty, noteLength);
     (async () => {
       try {
         const soap = await callGroq(transcript, systemPrompt);
         if (cancelled) return;
         const elapsed = Date.now() - startedAt.current;
         const meta = {
-          ms:        elapsed,
-          model:     MODEL,
-          specialty: specialty,
-          wordsIn:   transcript.trim().split(/\s+/).length,
-          wordsOut:  Object.values(soap).join(' ').trim().split(/\s+/).length,
+          ms:         elapsed,
+          model:      MODEL,
+          specialty:  specialty,
+          noteLength: noteLength,
+          wordsIn:    transcript.trim().split(/\s+/).length,
+          wordsOut:   Object.values(soap).join(' ').trim().split(/\s+/).length,
         };
         const minDelay = (SOAP_META.length - 1) * 550 + 200;
         const wait = Math.max(0, minDelay - elapsed);
@@ -133,7 +149,7 @@ export default function ScreenProcessing({ transcript, specialty = 'general', on
             Synthesizing note
           </h2>
           <span className="font-mono text-ink-4" style={{ fontSize: 11, letterSpacing: '0.06em' }}>
-            {wordCount} words · {specialtyLabel} template
+            {wordCount} words · {specialtyLabel} · {lengthLabel}
           </span>
         </div>
 
