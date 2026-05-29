@@ -3,21 +3,21 @@ import { ArrowLeft, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 const OVERLAY = {
   position: 'fixed', inset: 0, zIndex: 50,
-  background: 'rgba(2,5,14,0.88)',
-  backdropFilter: 'blur(10px)',
-  WebkitBackdropFilter: 'blur(10px)',
+  background: 'rgba(0,0,0,0.40)',
+  backdropFilter: 'blur(8px)',
+  WebkitBackdropFilter: 'blur(8px)',
   display: 'flex', alignItems: 'center', justifyContent: 'center',
   padding: '20px 16px',
 };
 
 const CARD = {
-  background: 'rgba(11,19,42,0.96)',
-  border: '1px solid rgba(255,255,255,0.09)',
-  borderRadius: 24,
+  background: '#ffffff',
+  border: '1px solid #D1D5DB',
+  borderRadius: 20,
   padding: '28px 24px 24px',
   maxWidth: 420,
   width: '100%',
-  boxShadow: '0 0 0 1px rgba(255,255,255,0.04), 0 32px 80px rgba(0,0,0,0.55)',
+  boxShadow: '0 20px 60px rgba(0,0,0,0.12)',
 };
 
 function LearnMoreScreen({ onBack, onAccept }) {
@@ -25,7 +25,7 @@ function LearnMoreScreen({ onBack, onAccept }) {
     <div style={{ ...OVERLAY, alignItems: 'stretch', padding: 0 }}>
       <div
         style={{
-          flex: 1, background: '#050a1a',
+          flex: 1, background: '#ffffff',
           display: 'flex', flexDirection: 'column',
           maxWidth: 560, margin: '0 auto', width: '100%',
         }}
@@ -33,14 +33,20 @@ function LearnMoreScreen({ onBack, onAccept }) {
         {/* Header */}
         <div
           className="flex items-center gap-3 px-5"
-          style={{ paddingTop: 'calc(18px + env(safe-area-inset-top))', paddingBottom: 16, borderBottom: '1px solid var(--navy-border)' }}
+          style={{
+            paddingTop: 'calc(18px + env(safe-area-inset-top))',
+            paddingBottom: 16,
+            borderBottom: '1px solid #D1D5DB',
+          }}
         >
           <button className="btn-icon" onClick={onBack} aria-label="Back">
             <ArrowLeft size={16} />
           </button>
           <div className="flex flex-col" style={{ lineHeight: 1.2 }}>
-            <span className="text-ink-1 font-semibold" style={{ fontSize: 14 }}>About NurseNote AI</span>
-            <span className="font-mono text-ink-5" style={{ fontSize: 9.5, letterSpacing: '0.08em' }}>FULL DISCLAIMER</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>About NurseNote AI</span>
+            <span className="font-mono" style={{ fontSize: 9.5, letterSpacing: '0.08em', color: '#9CA3AF' }}>
+              FULL DISCLAIMER
+            </span>
           </div>
         </div>
 
@@ -68,12 +74,12 @@ function LearnMoreScreen({ onBack, onAccept }) {
             },
             {
               title: 'Regulatory notice',
-              body: 'NurseNote AI is not FDA-cleared or CE-marked as a medical device. Use is subject to applicable laws and your institution\'s policies governing clinical documentation software.',
+              body: "NurseNote AI is not FDA-cleared or CE-marked as a medical device. Use is subject to applicable laws and your institution's policies governing clinical documentation software.",
             },
           ].map(({ title, body }) => (
             <div key={title} className="flex flex-col gap-1.5">
-              <span className="text-ink-1 font-semibold" style={{ fontSize: 13.5 }}>{title}</span>
-              <p className="m-0 text-ink-3" style={{ fontSize: 13, lineHeight: 1.65 }}>{body}</p>
+              <span style={{ fontSize: 13.5, fontWeight: 600, color: '#111827' }}>{title}</span>
+              <p className="m-0" style={{ fontSize: 13, lineHeight: 1.65, color: '#6B7280' }}>{body}</p>
             </div>
           ))}
         </div>
@@ -82,9 +88,9 @@ function LearnMoreScreen({ onBack, onAccept }) {
         <div
           className="px-5 flex flex-col gap-2.5"
           style={{
-            paddingTop: 16, paddingBottom: 'calc(24px + env(safe-area-inset-bottom))',
-            borderTop: '1px solid var(--navy-border)',
-            background: 'linear-gradient(180deg, transparent, #050a1a 30%)',
+            paddingTop: 16,
+            paddingBottom: 'calc(24px + env(safe-area-inset-bottom))',
+            borderTop: '1px solid #D1D5DB',
           }}
         >
           <button
@@ -124,19 +130,19 @@ export default function DisclaimerModal({ onAccept }) {
           <div
             style={{
               width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-              background: 'rgba(251,146,60,0.12)',
-              border: '1px solid rgba(251,146,60,0.25)',
+              background: '#fff7ed',
+              border: '1px solid #fed7aa',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#fb923c',
+              color: '#f97316',
             }}
           >
             <AlertTriangle size={18} strokeWidth={1.8} />
           </div>
           <div className="flex flex-col" style={{ lineHeight: 1.2, paddingTop: 2 }}>
-            <span className="text-ink-1 font-semibold" style={{ fontSize: 16 }}>
+            <span style={{ fontSize: 16, fontWeight: 600, color: '#111827' }}>
               Clinical Use Disclaimer
             </span>
-            <span className="font-mono text-ink-5" style={{ fontSize: 9.5, letterSpacing: '0.08em', marginTop: 3 }}>
+            <span className="font-mono" style={{ fontSize: 9.5, letterSpacing: '0.08em', marginTop: 3, color: '#9CA3AF' }}>
               READ BEFORE CONTINUING
             </span>
           </div>
@@ -144,15 +150,15 @@ export default function DisclaimerModal({ onAccept }) {
 
         {/* Body */}
         <p
-          className="text-ink-2 m-0"
-          style={{ fontSize: 14, lineHeight: 1.7, marginBottom: 24 }}
+          className="m-0"
+          style={{ fontSize: 14, lineHeight: 1.7, marginBottom: 24, color: '#374151' }}
         >
           NurseNote AI assists with documentation only. Always verify the accuracy of generated
           notes before clinical use. This tool does not replace clinical judgment.
         </p>
 
         {/* Divider */}
-        <div style={{ height: 1, background: 'var(--navy-border)', marginBottom: 20 }} />
+        <div style={{ height: 1, background: '#D1D5DB', marginBottom: 20 }} />
 
         {/* Buttons */}
         <div className="flex flex-col gap-2.5">

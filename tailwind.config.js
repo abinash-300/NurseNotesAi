@@ -7,27 +7,21 @@ export default {
   theme: {
     extend: {
       colors: {
-        'navy-1000': '#02050e',
-        'navy-950':  '#050a1a',
-        'navy-900':  '#08102a',
-        'navy-850':  '#0c1530',
-        'navy-800':  '#11203f',
-        'navy-700':  '#1a2c52',
-        'ink-1': '#f4f7ff',
-        'ink-2': '#c8d3ed',
-        'ink-3': '#8a99c2',
-        'ink-4': '#5f6e96',
-        'ink-5': '#3f4a6e',
+        'ink-1': '#111827',
+        'ink-2': '#374151',
+        'ink-3': '#6B7280',
+        'ink-4': '#9CA3AF',
+        'ink-5': '#D1D5DB',
       },
       fontFamily: {
         sans: ['Sora', 'system-ui', 'sans-serif'],
         mono: ['DM Mono', 'ui-monospace', 'monospace'],
       },
       boxShadow: {
-        'glow-cyan-sm': '0 0 0 1px rgba(0,212,255,0.20), 0 4px 16px rgba(0,212,255,0.12)',
-        'glow-cyan-md': '0 0 0 1px rgba(0,212,255,0.30), 0 8px 32px rgba(0,212,255,0.22)',
-        'glow-cyan-lg': '0 0 0 1px rgba(0,212,255,0.40), 0 16px 64px rgba(0,212,255,0.30)',
-        'glow-red-md':  '0 0 0 1px rgba(248,113,113,0.30), 0 8px 32px rgba(239,68,68,0.22)',
+        'glow-cyan-sm': '0 0 0 1px rgba(6,182,212,0.15), 0 4px 12px rgba(6,182,212,0.10)',
+        'glow-cyan-md': '0 0 0 1px rgba(6,182,212,0.20), 0 8px 24px rgba(6,182,212,0.12)',
+        'glow-cyan-lg': '0 0 0 1px rgba(6,182,212,0.25), 0 16px 48px rgba(6,182,212,0.15)',
+        'glow-red-md':  '0 0 0 1px rgba(239,68,68,0.20), 0 8px 24px rgba(239,68,68,0.15)',
       },
       keyframes: {
         'pulse-dot': {
@@ -35,12 +29,12 @@ export default {
           '50%':       { opacity: '0.4', transform: 'scale(0.8)' },
         },
         'mic-glow': {
-          '0%, 100%': { boxShadow: '0 0 40px rgba(0,212,255,0.35), 0 0 80px rgba(0,212,255,0.12)' },
-          '50%':       { boxShadow: '0 0 65px rgba(0,212,255,0.60), 0 0 130px rgba(0,212,255,0.25)' },
+          '0%, 100%': { boxShadow: '0 0 40px rgba(6,182,212,0.20), 0 0 80px rgba(6,182,212,0.08)' },
+          '50%':       { boxShadow: '0 0 55px rgba(6,182,212,0.35), 0 0 100px rgba(6,182,212,0.14)' },
         },
         'mic-glow-red': {
-          '0%, 100%': { boxShadow: '0 0 40px rgba(248,113,113,0.40), 0 0 80px rgba(248,113,113,0.15)' },
-          '50%':       { boxShadow: '0 0 65px rgba(248,113,113,0.65), 0 0 130px rgba(248,113,113,0.28)' },
+          '0%, 100%': { boxShadow: '0 0 40px rgba(239,68,68,0.25), 0 0 80px rgba(239,68,68,0.10)' },
+          '50%':       { boxShadow: '0 0 55px rgba(239,68,68,0.40), 0 0 100px rgba(239,68,68,0.16)' },
         },
         'rise-in': {
           '0%':   { opacity: '0', transform: 'translateY(12px)' },

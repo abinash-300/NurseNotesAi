@@ -10,21 +10,24 @@ const CHIP_CONFIGS = {
 export default function BrandRow({ state = 'idle' }) {
   const { label, mod, pulse } = CHIP_CONFIGS[state] ?? CHIP_CONFIGS.idle;
   return (
-    <div className="relative z-10 flex items-center justify-between px-5 py-3.5">
+    <div
+      className="relative z-10 flex items-center justify-between px-5 py-3.5"
+      style={{ borderBottom: '1px solid #D1D5DB', background: '#ffffff' }}
+    >
       <div className="flex items-center gap-2.5">
         <div
-          className="flex items-center justify-center text-cyan-400 rounded-[8px] border"
+          className="flex items-center justify-center rounded-[8px] border"
           style={{
             width: 30, height: 30,
-            background: 'linear-gradient(180deg, #0c1530, #050a1a)',
-            borderColor: 'var(--navy-border-strong)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
+            background: '#ecfeff',
+            borderColor: '#06B6D4',
+            color: '#06B6D4',
           }}
         >
           <Stethoscope size={16} />
         </div>
         <div className="flex flex-col" style={{ lineHeight: 1.05 }}>
-          <span className="text-ink-1 font-semibold" style={{ fontSize: 14, letterSpacing: '-0.01em' }}>
+          <span style={{ fontSize: 14, letterSpacing: '-0.01em', fontWeight: 600, color: '#111827' }}>
             NurseNote
           </span>
           <span className="eyebrow" style={{ fontSize: 8.5 }}>Voice Documentation</span>

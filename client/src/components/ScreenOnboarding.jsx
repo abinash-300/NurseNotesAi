@@ -4,19 +4,19 @@ import { Mic, Brain, Shield, ChevronRight } from 'lucide-react';
 const SLIDES = [
   {
     icon: 'mic',
-    color: '#22d3ee',
+    color: '#06B6D4',
     title: 'Voice to SOAP in seconds',
     subtitle: 'Speak naturally about your patient. NurseNote structures it into a clinical note instantly.',
   },
   {
     icon: 'brain',
-    color: '#c084fc',
+    color: '#a855f7',
     title: 'AI built for nurses',
     subtitle: 'Trained on clinical language. Understands vitals, medications, and assessments the way you speak them.',
   },
   {
     icon: 'shield',
-    color: '#34d399',
+    color: '#22C55E',
     title: 'Your notes stay private',
     subtitle: 'Nothing is stored. Notes clear automatically. No patient data ever leaves your session.',
   },
@@ -35,30 +35,22 @@ function SlideIcon({ icon, color }) {
       <div
         style={{
           position: 'absolute',
-          width: 160, height: 160, borderRadius: '50%',
-          background: `radial-gradient(circle at 50% 50%, ${color}18 0%, transparent 70%)`,
+          width: 180, height: 180, borderRadius: '50%',
+          background: `radial-gradient(circle, ${color}10 0%, transparent 70%)`,
         }}
       />
       {/* Main orb */}
       <div
         style={{
           width: 120, height: 120, borderRadius: '50%',
-          background: `radial-gradient(circle at 50% 35%, ${color}30 0%, ${color}10 55%, transparent 80%)`,
-          border: `1px solid ${color}40`,
-          boxShadow: `0 0 0 1px ${color}18, 0 0 48px ${color}28`,
+          background: `${color}0f`,
+          border: `2px solid ${color}`,
+          boxShadow: `0 0 0 8px ${color}0a`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           color,
           position: 'relative',
         }}
       >
-        {/* Inner highlight */}
-        <span
-          style={{
-            position: 'absolute', inset: 6, borderRadius: '50%',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -8px 20px rgba(0,0,0,0.25)',
-            pointerEvents: 'none',
-          }}
-        />
         <span style={{ position: 'relative' }}>{el}</span>
       </div>
     </div>
@@ -92,9 +84,13 @@ export default function ScreenOnboarding({ onComplete }) {
       {/* Header row */}
       <div
         className="relative z-10 flex items-center justify-between px-5"
-        style={{ paddingTop: 'calc(16px + env(safe-area-inset-top))', paddingBottom: 8, minHeight: 56 }}
+        style={{
+          paddingTop: 'calc(16px + env(safe-area-inset-top))',
+          paddingBottom: 8, minHeight: 56,
+          borderBottom: '1px solid #D1D5DB',
+        }}
       >
-        <span className="font-mono text-ink-5" style={{ fontSize: 10, letterSpacing: '0.10em' }}>
+        <span className="font-mono" style={{ fontSize: 10, letterSpacing: '0.10em', color: '#9CA3AF' }}>
           {slide + 1} / {SLIDES.length}
         </span>
         {!isLast && (
@@ -130,12 +126,12 @@ export default function ScreenOnboarding({ onComplete }) {
             <SlideIcon icon={s.icon} color={s.color} />
             <div className="text-center flex flex-col gap-3">
               <h2
-                className="text-ink-1 font-semibold m-0"
-                style={{ fontSize: 26, letterSpacing: '-0.02em', lineHeight: 1.2 }}
+                className="m-0 font-semibold"
+                style={{ fontSize: 26, letterSpacing: '-0.02em', lineHeight: 1.2, color: '#111827' }}
               >
                 {s.title}
               </h2>
-              <p className="text-ink-3 m-0" style={{ fontSize: 15, lineHeight: 1.65 }}>
+              <p className="m-0" style={{ fontSize: 15, lineHeight: 1.65, color: '#6B7280' }}>
                 {s.subtitle}
               </p>
             </div>
@@ -146,7 +142,11 @@ export default function ScreenOnboarding({ onComplete }) {
       {/* Footer: dots + CTA */}
       <div
         className="relative z-10 flex flex-col items-center gap-5 px-6"
-        style={{ paddingTop: 20, paddingBottom: 'calc(36px + env(safe-area-inset-bottom))' }}
+        style={{
+          paddingTop: 20,
+          paddingBottom: 'calc(36px + env(safe-area-inset-bottom))',
+          borderTop: '1px solid #D1D5DB',
+        }}
       >
         {/* Progress dots */}
         <div className="flex items-center gap-2.5">
@@ -159,9 +159,8 @@ export default function ScreenOnboarding({ onComplete }) {
                 width: i === slide ? 24 : 8,
                 height: 8,
                 borderRadius: 99,
-                background: i === slide ? '#22d3ee' : 'rgba(255,255,255,0.15)',
-                boxShadow: i === slide ? '0 0 10px rgba(34,211,238,0.55)' : 'none',
-                transition: 'width 280ms cubic-bezier(0.25,0.46,0.45,0.94), background 280ms, box-shadow 280ms',
+                background: i === slide ? '#06B6D4' : '#D1D5DB',
+                transition: 'width 280ms cubic-bezier(0.25,0.46,0.45,0.94), background 280ms',
                 border: 'none',
                 cursor: 'pointer',
                 padding: 0,

@@ -32,10 +32,9 @@ function SpecialtyRow({ specialty, onChange }) {
               borderRadius: 99,
               fontSize: 11,
               letterSpacing: '0.04em',
-              border: `1px solid ${active ? '#00d4ff' : '#0d2137'}`,
-              background: active ? 'rgba(0,212,255,0.12)' : '#0a1628',
-              color: active ? '#00d4ff' : '#2a5f7a',
-              boxShadow: active ? '0 0 12px rgba(0,212,255,0.30)' : 'none',
+              border: `1px solid ${active ? '#06B6D4' : '#D1D5DB'}`,
+              background: active ? '#ecfeff' : '#F3F4F6',
+              color: active ? '#06B6D4' : '#6B7280',
               transition: 'all 180ms ease',
               cursor: 'pointer',
               WebkitTapHighlightColor: 'transparent',
@@ -64,8 +63,8 @@ function NoteLengthControl({ noteLength, onChange }) {
       <div
         style={{
           display: 'flex',
-          background: '#060e1a',
-          border: '1px solid #0d2137',
+          background: '#F3F4F6',
+          border: '1px solid #D1D5DB',
           borderRadius: 10,
           padding: 3,
         }}
@@ -83,9 +82,10 @@ function NoteLengthControl({ noteLength, onChange }) {
                 fontSize: 12,
                 fontWeight: active ? 600 : 400,
                 fontFamily: 'Sora, system-ui, sans-serif',
-                border: `1px solid ${active ? 'rgba(0,212,255,0.30)' : 'transparent'}`,
-                background: active ? 'rgba(0,212,255,0.10)' : 'transparent',
-                color: active ? '#00d4ff' : '#1a3a4a',
+                border: 'none',
+                background: active ? '#ffffff' : 'transparent',
+                color: active ? '#06B6D4' : '#6B7280',
+                boxShadow: active ? '0 1px 3px rgba(0,0,0,0.10)' : 'none',
                 cursor: 'pointer',
                 transition: 'all 160ms ease',
                 WebkitTapHighlightColor: 'transparent',
@@ -121,8 +121,8 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
 
       {speechSupported ? (
         /* ── Normal hero ── */
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center gap-6 px-6 pt-2">
-          <span className="eyebrow" style={{ fontSize: 9.5, color: '#1e3a4a' }}>
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center gap-5 px-6 pt-2">
+          <span className="eyebrow" style={{ fontSize: 9.5 }}>
             READY · SESSION {1000 + sessions.length + 1}
           </span>
 
@@ -134,18 +134,18 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
                 width: 220,
                 height: 220,
                 borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(0,212,255,0.12) 0%, rgba(0,212,255,0.04) 50%, transparent 70%)',
+                background: 'radial-gradient(circle, rgba(6,182,212,0.08) 0%, rgba(6,182,212,0.02) 55%, transparent 70%)',
                 pointerEvents: 'none',
               }}
             />
-            <MicCore onTap={onStart} size={144} />
+            <MicCore onTap={onStart} size={140} />
           </div>
 
           <div className="text-center flex flex-col gap-1.5">
-            <span style={{ fontSize: '1.6rem', fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1.15 }}>
+            <span style={{ fontSize: '1.6rem', fontWeight: 700, color: '#111827', letterSpacing: '-0.02em', lineHeight: 1.15 }}>
               Press to begin
             </span>
-            <span style={{ fontSize: 13.5, color: '#4a90a4', lineHeight: 1.45 }}>
+            <span style={{ fontSize: 13.5, color: '#6B7280', lineHeight: 1.45 }}>
               Speak the patient report.<br />SOAP note generated in seconds.
             </span>
           </div>
@@ -167,22 +167,21 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
             className="flex items-center justify-center"
             style={{
               width: 80, height: 80, borderRadius: '50%',
-              background: 'radial-gradient(circle at 50% 30%, rgba(251,146,60,0.20), transparent 70%)',
-              border: '1px solid rgba(251,146,60,0.25)',
-              boxShadow: '0 0 0 1px rgba(251,146,60,0.12), 0 8px 32px rgba(251,146,60,0.15)',
-              color: '#fb923c',
+              background: '#fff7ed',
+              border: '1px solid #fed7aa',
+              color: '#f97316',
             }}
           >
             <Smartphone size={34} strokeWidth={1.6} />
           </div>
 
           <div className="text-center flex flex-col gap-2.5">
-            <span className="text-ink-1 font-semibold" style={{ fontSize: 22, letterSpacing: '-0.015em' }}>
+            <span style={{ fontSize: 22, fontWeight: 700, color: '#111827', letterSpacing: '-0.015em' }}>
               Voice not available
             </span>
-            <span className="text-ink-3" style={{ fontSize: 14, lineHeight: 1.6 }}>
+            <span style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6 }}>
               Safari doesn't support voice input.<br />
-              Open in <span className="text-ink-1 font-medium">Chrome on Android</span> for<br />
+              Open in <span style={{ color: '#111827', fontWeight: 600 }}>Chrome on Android</span> for<br />
               full voice recording.
             </span>
           </div>
@@ -199,7 +198,7 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
               <Zap size={16} />
               Try demo patient
             </button>
-            <p className="text-center font-mono text-ink-4" style={{ fontSize: 10.5, letterSpacing: '0.06em' }}>
+            <p className="text-center font-mono" style={{ fontSize: 10.5, letterSpacing: '0.06em', color: '#9CA3AF' }}>
               SEE THE FULL SOAP NOTE EXPERIENCE
             </p>
           </div>
@@ -208,10 +207,17 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
 
       {/* Recent notes */}
       <div className="relative z-10 px-4 pb-3">
-        <div className="card-glass" style={{ padding: '14px 16px' }}>
+        <div
+          style={{
+            background: '#F3F4F6',
+            border: '1px solid #D1D5DB',
+            borderRadius: 16,
+            padding: '14px 16px',
+          }}
+        >
           <div className="flex items-center justify-between mb-2.5">
             <span className="eyebrow">Recent notes</span>
-            <span className="font-mono text-ink-5" style={{ fontSize: 10, letterSpacing: '0.08em' }}>
+            <span className="font-mono" style={{ fontSize: 10, letterSpacing: '0.08em', color: '#9CA3AF' }}>
               THIS SESSION
             </span>
           </div>
@@ -221,19 +227,19 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
               <div
                 style={{
                   width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                  background: '#0a1628',
-                  border: '1px solid rgba(0,212,255,0.10)',
+                  background: '#ecfeff',
+                  border: '1px solid rgba(6,182,212,0.20)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: 'rgba(0,212,255,0.30)',
+                  color: '#06B6D4',
                 }}
               >
                 <Activity size={16} />
               </div>
               <div className="text-center flex flex-col gap-1">
-                <span className="text-ink-4" style={{ fontSize: 13, letterSpacing: '-0.01em' }}>
+                <span style={{ fontSize: 13, color: '#6B7280', letterSpacing: '-0.01em' }}>
                   Your recent notes appear here
                 </span>
-                <span className="font-mono text-ink-5" style={{ fontSize: 10, letterSpacing: '0.06em' }}>
+                <span className="font-mono" style={{ fontSize: 10, letterSpacing: '0.06em', color: '#9CA3AF' }}>
                   NOTES ARE KEPT FOR THIS SESSION ONLY
                 </span>
               </div>
@@ -243,26 +249,34 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
               <div
                 key={session.id}
                 className="flex items-center justify-between py-2.5 cursor-pointer"
-                style={{ borderBottom: i < sessions.length - 1 ? '1px solid var(--navy-border)' : 'none' }}
+                style={{
+                  borderBottom: i < sessions.length - 1 ? '1px solid #D1D5DB' : 'none',
+                  borderRadius: 8,
+                  padding: '10px 8px',
+                  margin: '0 -8px',
+                  transition: 'background 150ms',
+                }}
                 onClick={() => onOpenSession(session)}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#ffffff'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
               >
                 <div className="flex items-center gap-2.5">
                   <div
                     className="flex items-center justify-center rounded-[8px] flex-shrink-0"
                     style={{
                       width: 28, height: 28,
-                      background: 'rgba(0,212,255,0.06)',
-                      border: '1px solid rgba(0,212,255,0.15)',
-                      color: '#00d4ff',
+                      background: '#ecfeff',
+                      border: '1px solid rgba(6,182,212,0.20)',
+                      color: '#06B6D4',
                     }}
                   >
                     <Activity size={14} />
                   </div>
                   <div className="flex flex-col" style={{ lineHeight: 1.2 }}>
-                    <span className="text-ink-1" style={{ fontSize: 13 }}>
+                    <span style={{ fontSize: 13, color: '#111827' }}>
                       {subjectivePreview(session.soap.subjective)}
                     </span>
-                    <span className="font-mono text-ink-4" style={{ fontSize: 10, letterSpacing: '0.06em' }}>
+                    <span className="font-mono" style={{ fontSize: 10, letterSpacing: '0.06em', color: '#9CA3AF' }}>
                       #{session.id} · {timeAgo(session.meta.createdAt)}
                     </span>
                   </div>
@@ -278,8 +292,8 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
 
       {/* Trust footer */}
       <div className="relative z-10 flex items-center justify-center gap-2 py-3">
-        <Lock size={11} style={{ color: '#0d2a3a' }} />
-        <span className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.12em', color: '#0d2a3a' }}>
+        <Lock size={11} style={{ color: '#D1D5DB' }} />
+        <span className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.12em', color: '#D1D5DB' }}>
           End-to-end encrypted · Nothing stored
         </span>
       </div>

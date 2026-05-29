@@ -137,29 +137,36 @@ export default function ScreenProcessing({ transcript, specialty = 'general', no
         {/* Spinning brain */}
         <div className="text-center flex flex-col items-center gap-2 mt-3">
           <div
-            className="flex items-center justify-center text-cyan-400"
+            className="flex items-center justify-center"
             style={{
               width: 64, height: 64, borderRadius: '50%',
-              background: 'radial-gradient(circle at 50% 30%, rgba(34,211,238,0.25), transparent 70%)',
-              border: '1px solid rgba(34,211,238,0.25)',
-              boxShadow: 'var(--glow-cyan-md)',
+              background: '#ecfeff',
+              border: '1px solid #06B6D4',
+              color: '#06B6D4',
+              boxShadow: '0 0 0 6px rgba(6,182,212,0.08)',
             }}
           >
             <span className="animate-spin inline-flex"><Brain size={28} /></span>
           </div>
           <h2
-            className="text-ink-1 font-semibold m-0"
-            style={{ fontSize: 22, letterSpacing: '-0.015em' }}
+            className="m-0 font-semibold"
+            style={{ fontSize: 22, letterSpacing: '-0.015em', color: '#111827' }}
           >
             Synthesizing note
           </h2>
-          <span className="font-mono text-ink-4" style={{ fontSize: 11, letterSpacing: '0.06em' }}>
+          <span className="font-mono" style={{ fontSize: 11, letterSpacing: '0.06em', color: '#9CA3AF' }}>
             {wordCount} words · {specialtyLabel} · {lengthLabel}
           </span>
         </div>
 
         {/* S → O → A → P pipeline */}
-        <div className="card-solid" style={{ padding: '6px 4px' }}>
+        <div
+          style={{
+            background: '#ffffff', border: '1px solid #D1D5DB',
+            borderRadius: 16, padding: '6px 4px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+          }}
+        >
           {SOAP_META.map((s, i) => {
             const done   = i < step;
             const active = i === step;
@@ -168,7 +175,7 @@ export default function ScreenProcessing({ transcript, specialty = 'general', no
                 key={s.key}
                 className="flex items-center gap-3.5 px-4 py-3.5"
                 style={{
-                  borderBottom: i < SOAP_META.length - 1 ? '1px solid var(--navy-border)' : 'none',
+                  borderBottom: i < SOAP_META.length - 1 ? '1px solid #D1D5DB' : 'none',
                   opacity: i > step ? 0.35 : 1,
                   transition: 'opacity 300ms',
                 }}
@@ -178,23 +185,23 @@ export default function ScreenProcessing({ transcript, specialty = 'general', no
                   style={{
                     width: 28, height: 28, borderRadius: '50%',
                     fontSize: 13, fontWeight: 500,
-                    border: `1px solid ${done ? s.color + '88' : active ? s.color + '55' : 'var(--navy-border)'}`,
-                    background: done ? s.color + '22' : 'transparent',
-                    color: done || active ? s.color : '#5f6e96',
+                    border: `1px solid ${done ? '#22C55E' : active ? s.color : '#D1D5DB'}`,
+                    background: done ? '#f0fdf4' : active ? `${s.color}14` : '#F3F4F6',
+                    color: done ? '#22C55E' : active ? s.color : '#9CA3AF',
                   }}
                 >
                   {done ? <Check size={14} /> : s.letter}
                   {active && (
                     <span
                       className="absolute animate-pulse-dot"
-                      style={{ inset: -3, borderRadius: '50%', border: `1px solid ${s.color}66` }}
+                      style={{ inset: -3, borderRadius: '50%', border: `1px solid ${s.color}44` }}
                     />
                   )}
                 </div>
 
                 <div className="flex flex-col flex-1">
-                  <span className="text-ink-1 font-medium" style={{ fontSize: 14 }}>{s.title}</span>
-                  <span className="font-mono text-ink-4" style={{ fontSize: 10, letterSpacing: '0.08em' }}>
+                  <span className="font-medium" style={{ fontSize: 14, color: '#111827' }}>{s.title}</span>
+                  <span className="font-mono" style={{ fontSize: 10, letterSpacing: '0.08em', color: '#9CA3AF' }}>
                     {done ? 'Synthesized' : active ? 'Writing…' : 'Pending'}
                   </span>
                 </div>
@@ -207,11 +214,11 @@ export default function ScreenProcessing({ transcript, specialty = 'general', no
         {/* Elapsed */}
         <div
           className="flex items-center justify-between px-3.5 py-3 rounded-xl"
-          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--navy-border)' }}
+          style={{ background: '#F3F4F6', border: '1px solid #D1D5DB' }}
         >
           <div className="flex items-center gap-2.5">
-            <Activity size={14} className="text-cyan-400" />
-            <span className="text-ink-2" style={{ fontSize: 12.5 }}>
+            <Activity size={14} style={{ color: '#06B6D4' }} />
+            <span style={{ fontSize: 12.5, color: '#6B7280' }}>
               {(tick / 1000).toFixed(1)}s elapsed
             </span>
           </div>
@@ -222,8 +229,8 @@ export default function ScreenProcessing({ transcript, specialty = 'general', no
       </div>
 
       <div className="relative z-10 flex items-center justify-center gap-2 py-3">
-        <Shield size={11} className="text-ink-5" />
-        <span className="font-mono text-ink-5 uppercase" style={{ fontSize: 10, letterSpacing: '0.12em' }}>
+        <Shield size={11} style={{ color: '#D1D5DB' }} />
+        <span className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.12em', color: '#D1D5DB' }}>
           Encrypted in transit · Groq cloud
         </span>
       </div>

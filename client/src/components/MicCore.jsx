@@ -12,10 +12,10 @@ export default function MicCore({ recording = false, onTap, size = 140 }) {
         width: size,
         height: size,
         borderRadius: '50%',
-        border: `1px solid ${recording ? 'rgba(248,113,113,0.3)' : 'rgba(0,212,255,0.3)'}`,
+        border: `3px solid ${recording ? '#ef4444' : '#06B6D4'}`,
         background: recording
-          ? 'radial-gradient(circle at 28% 22%, rgba(255,255,255,0.85) 0%, rgba(255,200,200,0.65) 10%, #fca5a5 24%, #b91c1c 62%, #450a0a 100%)'
-          : 'radial-gradient(circle at 28% 22%, rgba(255,255,255,0.90) 0%, rgba(200,245,255,0.70) 12%, #00e5ff 28%, #0080aa 65%, #003344 100%)',
+          ? 'radial-gradient(circle, #fff5f5 0%, #ffffff 70%)'
+          : 'radial-gradient(circle, #f0fafb 0%, #ffffff 70%)',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
@@ -24,32 +24,18 @@ export default function MicCore({ recording = false, onTap, size = 140 }) {
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      {/* Specular highlight — top-left light reflection */}
+      {/* Subtle inner ring */}
       <span
         style={{
           position: 'absolute',
-          top: '12%',
-          left: '14%',
-          width: '32%',
-          height: '28%',
+          inset: 6,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(255,255,255,0.70) 0%, rgba(255,255,255,0.18) 60%, transparent 100%)',
-          pointerEvents: 'none',
-          filter: 'blur(2px)',
-        }}
-      />
-      {/* Inner rim shadow for depth */}
-      <span
-        style={{
-          position: 'absolute',
-          inset: 0,
-          borderRadius: '50%',
-          boxShadow: 'inset 0 -6px 20px rgba(0,0,0,0.45), inset 0 2px 6px rgba(255,255,255,0.15)',
+          border: `1px solid ${recording ? 'rgba(239,68,68,0.12)' : 'rgba(6,182,212,0.15)'}`,
           pointerEvents: 'none',
         }}
       />
-      <span style={{ position: 'relative', color: recording ? '#fff' : '#03101a', filter: recording ? 'none' : 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))' }}>
-        {recording ? <Square size={36} /> : <Mic size={42} strokeWidth={1.8} />}
+      <span style={{ position: 'relative', color: recording ? '#ef4444' : '#06B6D4' }}>
+        {recording ? <Square size={36} strokeWidth={2} /> : <Mic size={42} strokeWidth={1.8} />}
       </span>
     </button>
   );

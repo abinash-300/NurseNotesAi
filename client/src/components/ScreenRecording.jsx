@@ -91,7 +91,7 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
         <div className="text-center flex flex-col gap-1">
           <span
             className="font-sans font-semibold tabular-nums"
-            style={{ fontSize: 52, letterSpacing: '-0.02em', color: '#fca5a5', lineHeight: 1 }}
+            style={{ fontSize: 52, letterSpacing: '-0.02em', color: '#111827', lineHeight: 1 }}
           >
             {fmtTime(seconds)}
           </span>
@@ -105,29 +105,39 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
         </div>
 
         <MicCore recording onTap={handleStop} size={110} />
-        <Waveform active={!recError} count={42} color="#f87171" height={48} />
+        <Waveform active={!recError} count={42} color="#06B6D4" height={48} />
 
         {/* Live transcript card */}
         <div
-          className="card-glass w-full relative"
-          style={{ padding: '14px 16px', maxHeight: 200, overflow: 'hidden' }}
+          className="w-full relative"
+          style={{
+            padding: '14px 16px', maxHeight: 200, overflow: 'hidden',
+            background: '#F3F4F6', border: '1px solid #D1D5DB', borderRadius: 16,
+          }}
         >
           <div className="flex items-center justify-between mb-2.5">
             <span className="eyebrow">Live transcript</span>
-            <span className="chip chip-live" style={{ fontSize: 9 }}>
+            <span
+              className="font-mono flex items-center gap-1.5"
+              style={{
+                fontSize: 9, padding: '4px 9px', borderRadius: 99,
+                background: '#ecfeff', border: '1px solid #06B6D4', color: '#06B6D4',
+                letterSpacing: '0.06em',
+              }}
+            >
               <span className="dot animate-pulse-dot" />
               {wordCount} word{wordCount === 1 ? '' : 's'}
             </span>
           </div>
 
           {recError ? (
-            <p className="m-0 font-mono" style={{ fontSize: 12, color: '#fca5a5', lineHeight: 1.55 }}>
+            <p className="m-0 font-mono" style={{ fontSize: 12, color: '#ef4444', lineHeight: 1.55 }}>
               {recError}
             </p>
           ) : lines.length === 0 ? (
-            <p className="m-0 text-ink-4 italic" style={{ fontSize: 13, lineHeight: 1.55 }}>
+            <p className="m-0 italic" style={{ fontSize: 13, lineHeight: 1.55, color: '#9CA3AF' }}>
               Listening… start speaking the patient report.
-              <span className="text-cyan-400"> ▍</span>
+              <span style={{ color: '#06B6D4' }}> ▍</span>
             </p>
           ) : (
             <div className="flex flex-col gap-1.5">
@@ -137,12 +147,12 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
                   className="m-0"
                   style={{
                     fontSize: 13,
-                    color: i === lines.length - 1 ? '#f4f7ff' : '#c8d3ed',
+                    color: '#374151',
                     lineHeight: 1.45,
                   }}
                 >
                   {line}
-                  {i === lines.length - 1 && <span className="text-cyan-400"> ▍</span>}
+                  {i === lines.length - 1 && <span style={{ color: '#06B6D4' }}> ▍</span>}
                 </p>
               ))}
             </div>
@@ -151,7 +161,7 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
           {/* Bottom fade */}
           <div
             className="absolute left-0 right-0 bottom-0 h-8 pointer-events-none"
-            style={{ background: 'linear-gradient(180deg, transparent, #050a1a)' }}
+            style={{ background: 'linear-gradient(180deg, transparent, #F3F4F6)', borderRadius: '0 0 16px 16px' }}
           />
         </div>
 
@@ -173,7 +183,7 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
       </div>
 
       <div className="relative z-10 flex items-center justify-center gap-2 py-3">
-        <span className="font-mono text-ink-5 uppercase" style={{ fontSize: 10, letterSpacing: '0.12em' }}>
+        <span className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.12em', color: '#D1D5DB' }}>
           End-to-end encrypted · Nothing stored
         </span>
       </div>

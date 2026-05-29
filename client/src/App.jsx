@@ -107,10 +107,9 @@ export default function App() {
         <div
           className="fixed top-4 left-4 right-4 z-50 rounded-xl px-4 py-3 font-mono text-sm"
           style={{
-            background: 'rgba(127,29,29,0.92)',
-            border: '1px solid rgba(248,113,113,0.30)',
-            color: '#fca5a5',
-            backdropFilter: 'blur(8px)',
+            background: '#111827',
+            border: 'none',
+            color: '#ffffff',
           }}
         >
           {toast}
