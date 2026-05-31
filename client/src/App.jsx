@@ -5,6 +5,7 @@ import ScreenIdle      from './components/ScreenIdle.jsx';
 import ScreenRecording from './components/ScreenRecording.jsx';
 import ScreenProcessing from './components/ScreenProcessing.jsx';
 import ScreenResult    from './components/ScreenResult.jsx';
+import InstallPrompt   from './components/InstallPrompt.jsx';
 
 const vibrate = (pattern) => { try { navigator.vibrate?.(pattern); } catch {} };
 
@@ -102,6 +103,8 @@ export default function App() {
 
   return (
     <>
+      <InstallPrompt />
+
       {/* Error toast */}
       {toast && (
         <div
