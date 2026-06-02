@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight, Activity, Mic, Smartphone, Lock } from 'lucide-react';
+import { ChevronRight, Activity, Smartphone, Lock } from 'lucide-react';
 import BrandRow from './BrandRow.jsx';
 import ProfileSheet from './ProfileSheet.jsx';
+import MicCore from './MicCore.jsx';
 
 const speechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
@@ -94,27 +95,8 @@ export default function ScreenIdle({
 
           {/* ── Mic hero ───────────────────────────────────── */}
           {speechSupported ? (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22 }}>
-              {/* Glassmorphism card */}
-              <button
-                onClick={onStart}
-                aria-label="Start recording"
-                className="animate-mic-glow tap-scale"
-                style={{
-                  width: 180, height: 180,
-                  borderRadius: 32,
-                  background: 'rgba(255,255,255,0.72)',
-                  backdropFilter: 'blur(20px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                  border: '1px solid rgba(255,255,255,0.80)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                <Mic size={48} strokeWidth={1.5} style={{ color: '#06B6D4' }} />
-              </button>
-
-              {/* Text below card */}
+            <div className="apple-card flex flex-col items-center gap-5 py-10 px-6">
+              <MicCore onTap={onStart} size={140} />
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 28, fontWeight: 700, color: '#000000', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
                   Press to begin
