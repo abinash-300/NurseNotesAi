@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import DisclaimerModal  from './components/DisclaimerModal.jsx';
 import ScreenOnboarding from './components/ScreenOnboarding.jsx';
 import ScreenIdle      from './components/ScreenIdle.jsx';
@@ -104,6 +105,7 @@ export default function App() {
 
   return (
     <>
+      <SpeedInsights />
       <InstallPrompt />
 
       {/* Error toast */}
