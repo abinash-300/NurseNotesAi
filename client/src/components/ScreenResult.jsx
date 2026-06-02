@@ -36,7 +36,7 @@ const SOAP_META = [
   { key: 'plan',       letter: 'P', title: 'Plan',       color: '#22C55E' },
 ];
 
-function SoapCard({ section, body, index, onSave }) {
+function SoapCard({ section, body, index, onSave, flagged, onFlag }) {
   const [copied,  setCopied]  = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft,   setDraft]   = useState('');
@@ -56,24 +56,31 @@ function SoapCard({ section, body, index, onSave }) {
   const save      = () => { onSave(draft); setEditing(false); };
   const cancel    = () => { setEditing(false); };
 
+  const borderColor = flagged ? '#F59E0B' : section.color;
+
   return (
     <div
       className="animate-rise-in"
       style={{
         background: '#ffffff',
         border: '1px solid #D1D5DB',
-        borderLeft: `4px solid ${section.color}`,
+        borderLeft: `4px solid ${borderColor}`,
         borderRadius: 12,
         padding: '18px 20px',
         boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
         animationDelay: `${index * 90}ms`,
+        transition: 'border-left-color 200ms ease',
       }}
     >
       <div className="flex items-center justify-between mb-2.5">
         <div className="flex items-center gap-3">
           <span
             className="font-mono flex-shrink-0"
-            style={{ fontSize: 18, fontWeight: 600, color: section.color }}
+            style={{
+              fontSize: 18, fontWeight: 600,
+              color: flagged ? '#F59E0B' : section.color,
+              transition: 'color 200ms ease',
+            }}
           >
             {section.letter}
           </span>
@@ -110,14 +117,30 @@ function SoapCard({ section, body, index, onSave }) {
               <Edit2 size={13} />
             </button>
             <button
-              aria-label="Flag"
-              style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF' }}
+              onClick={onFlag}
+              aria-label={flagged ? 'Remove flag' : 'Flag for review'}
+              style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: flagged ? '#F59E0B' : '#9CA3AF', transition: 'color 150ms ease' }}
             >
-              <Flag size={13} />
+              <Flag size={13} fill={flagged ? '#F59E0B' : 'none'} />
             </button>
           </div>
         )}
       </div>
+
+      {flagged && (
+        <div className="mb-2.5">
+          <span
+            className="font-mono"
+            style={{
+              fontSize: 10, letterSpacing: '0.06em',
+              padding: '3px 8px', borderRadius: 99,
+              background: '#FEF3C7', border: '1px solid #F59E0B', color: '#92400E',
+            }}
+          >
+            NEEDS REVIEW
+          </span>
+        </div>
+      )}
 
       {editing ? (
         <>
@@ -155,10 +178,12 @@ function SoapCard({ section, body, index, onSave }) {
 }
 
 export default function ScreenResult({ soap, meta, onNew, showToast }) {
-  const [fullCopied, setFullCopied] = useState(false);
-  const [editedSoap, setEditedSoap] = useState(() => ({ ...soap }));
-  const [, forceUpdate]             = useState(0);
-  const [remaining,  setRemaining]  = useState(CLEAR_SECS);
+  const [fullCopied,  setFullCopied]  = useState(false);
+  const [editedSoap,  setEditedSoap]  = useState(() => ({ ...soap }));
+  const [,            forceUpdate]    = useState(0);
+  const [remaining,   setRemaining]   = useState(CLEAR_SECS);
+  const [flaggedKeys, setFlaggedKeys] = useState(new Set());
+  const [copyConfirm, setCopyConfirm] = useState(false);
 
   // Re-render every 15s so the "X mins ago" timestamp stays fresh
   useEffect(() => {
@@ -184,14 +209,44 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
 
   const updateSection = (key, text) => setEditedSoap((prev) => ({ ...prev, [key]: text }));
 
+  const toggleFlag = (key) => {
+    vibrate(20);
+    setFlaggedKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
   const fullNote = SOAP_META
     .map((s) => `${s.title.toUpperCase()}:\n${editedSoap[s.key] ?? ''}`)
     .join('\n\n');
 
+  const fullNoteWithFlags = SOAP_META
+    .map((s) => {
+      const body   = editedSoap[s.key] ?? '';
+      const prefix = flaggedKeys.has(s.key) ? '[NEEDS REVIEW] ' : '';
+      return `${s.title.toUpperCase()}:\n${prefix}${body}`;
+    })
+    .join('\n\n');
+
   const copyFull = async () => {
+    if (flaggedKeys.size > 0) {
+      setCopyConfirm(true);
+      return;
+    }
     vibrate(30);
     try { await navigator.clipboard.writeText(fullNote); } catch {}
     setFullCopied(true);
+    setTimeout(() => setFullCopied(false), 1800);
+  };
+
+  const copyAnyway = async () => {
+    vibrate(30);
+    try { await navigator.clipboard.writeText(fullNoteWithFlags); } catch {}
+    setFullCopied(true);
+    setCopyConfirm(false);
     setTimeout(() => setFullCopied(false), 1800);
   };
 
@@ -306,6 +361,8 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
             body={editedSoap[s.key] ?? '(not generated)'}
             index={i}
             onSave={(text) => updateSection(s.key, text)}
+            flagged={flaggedKeys.has(s.key)}
+            onFlag={() => toggleFlag(s.key)}
           />
         ))}
 
@@ -330,6 +387,49 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
           ))}
         </div>
       </div>
+
+      {/* Flag-copy confirmation overlay */}
+      {copyConfirm && (
+        <div
+          className="absolute left-0 right-0 z-30 mx-3"
+          style={{
+            bottom: 'calc(92px + env(safe-area-inset-bottom))',
+            background: '#FFFBEB',
+            border: '1px solid #F59E0B',
+            borderRadius: 14,
+            padding: '14px 16px',
+            boxShadow: '0 4px 20px rgba(245,158,11,0.18)',
+          }}
+        >
+          <p style={{ margin: '0 0 12px', fontSize: 13.5, color: '#92400E', lineHeight: 1.5 }}>
+            {flaggedKeys.size === 1 ? '1 section' : `${flaggedKeys.size} sections`} flagged for review. Copy anyway?
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setCopyConfirm(false)}
+              style={{
+                flex: 1, padding: '9px 12px', borderRadius: 9,
+                fontSize: 13, fontWeight: 500,
+                background: 'transparent', border: '1px solid #F59E0B',
+                color: '#92400E', cursor: 'pointer',
+              }}
+            >
+              Review first
+            </button>
+            <button
+              onClick={copyAnyway}
+              style={{
+                flex: 1, padding: '9px 12px', borderRadius: 9,
+                fontSize: 13, fontWeight: 600,
+                background: '#F59E0B', border: 'none',
+                color: '#ffffff', cursor: 'pointer',
+              }}
+            >
+              Copy anyway
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Sticky bottom bar */}
       <div
