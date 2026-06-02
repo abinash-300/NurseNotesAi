@@ -115,10 +115,10 @@
     color: #ffffff;
     background: #06B6D4;
     border: none;
-    transition: opacity 120ms ease, transform 120ms ease;
+    transition: opacity 80ms ease, transform 80ms ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .btn-primary:active { transform: scale(0.98); opacity: 0.85; }
+  .btn-primary:active { transform: scale(0.97); opacity: 0.85; }
   .btn-primary:disabled { opacity: 0.40; cursor: not-allowed; transform: none; }
 
   .btn-ghost {
@@ -131,10 +131,10 @@
     background: rgba(120,120,128,0.12);
     border: none;
     color: #000000;
-    transition: opacity 120ms ease;
+    transition: opacity 80ms ease, transform 80ms ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .btn-ghost:active { transform: scale(0.98); opacity: 0.80; }
+  .btn-ghost:active { transform: scale(0.97); opacity: 0.80; }
 
   .btn-icon {
     @apply inline-flex items-center justify-center cursor-pointer select-none;
@@ -145,10 +145,17 @@
     border: none;
     color: #000000;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
-    transition: transform 100ms ease, opacity 100ms ease;
+    transition: transform 80ms ease, opacity 80ms ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .btn-icon:active { transform: scale(0.98); opacity: 0.80; }
+  .btn-icon:active { transform: scale(0.97); opacity: 0.80; }
+
+  /* ── Universal press scale ─────────────────────────────── */
+  .tap-scale {
+    transition: transform 80ms ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tap-scale:active { transform: scale(0.97); }
 
   /* ── Typography helpers ────────────────────────────────── */
   .eyebrow {

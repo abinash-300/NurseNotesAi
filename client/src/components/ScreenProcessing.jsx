@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Brain, Check, Activity } from 'lucide-react';
+import { Check, Activity } from 'lucide-react';
 import BrandRow from './BrandRow.jsx';
 
 const BASE_PROMPT = `You are an expert clinical documentation assistant specializing in nursing notes.
@@ -74,6 +74,68 @@ async function callGroq(transcript, systemPrompt) {
   return JSON.parse(text);
 }
 
+const SHIMMER = {
+  background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
+  backgroundSize: '200% 100%',
+  animation: 'shimmer 1.5s ease-in-out infinite',
+  borderRadius: 5,
+};
+
+function SkeletonCard({ section, done, active }) {
+  if (done) {
+    return (
+      <div
+        className="apple-card animate-rise-in"
+        style={{ padding: '16px 18px' }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div
+            style={{
+              width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+              background: 'rgba(52,199,89,0.12)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <Check size={16} style={{ color: '#34C759' }} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 16, fontWeight: 600, color: '#000000' }}>{section.title}</div>
+            <div style={{ fontSize: 12, color: '#34C759', marginTop: 2 }}>Synthesized</div>
+          </div>
+          <span style={{ fontSize: 11, fontWeight: 600, color: '#34C759', background: 'rgba(52,199,89,0.12)', padding: '3px 9px', borderRadius: 99 }}>
+            OK
+          </span>
+        </div>
+        <div style={{ marginTop: 12, height: 8, width: '90%', ...SHIMMER, background: 'rgba(52,199,89,0.08)', animation: 'none', borderRadius: 4 }} />
+        <div style={{ marginTop: 6, height: 8, width: '65%', background: 'rgba(52,199,89,0.06)', borderRadius: 4 }} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="apple-card" style={{ padding: '16px 18px' }}>
+      {/* Header row skeleton */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+        <div style={{ width: 36, height: 36, borderRadius: '50%', flexShrink: 0, ...SHIMMER }} />
+        <div style={{ flex: 1 }}>
+          <div style={{ height: 10, width: '40%', ...SHIMMER }} />
+          <div style={{ height: 8, width: '25%', marginTop: 6, ...SHIMMER }} />
+        </div>
+        {active && (
+          <span
+            className="animate-pulse-dot"
+            style={{ width: 8, height: 8, borderRadius: '50%', background: section.color, flexShrink: 0 }}
+          />
+        )}
+      </div>
+      {/* Body lines skeleton */}
+      <div style={{ height: 8, width: '100%', ...SHIMMER }} />
+      <div style={{ height: 8, width: '85%',  marginTop: 7, ...SHIMMER }} />
+      <div style={{ height: 8, width: '60%',  marginTop: 7, ...SHIMMER }} />
+    </div>
+  );
+}
+
 export default function ScreenProcessing({ transcript, specialty = 'general', noteLength = 'standard', onDone, onError }) {
   const [step, setStep] = useState(0);
   const [tick, setTick] = useState(0);
@@ -130,112 +192,49 @@ export default function ScreenProcessing({ transcript, specialty = 'general', no
     <div className="screen">
       <BrandRow state="processing" />
 
-      <div className="flex-1 flex flex-col items-center justify-center px-4 gap-4">
+      <div className="flex-1 overflow-y-auto scroll-thin">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '20px 16px 24px' }}>
 
-        {/* Brain in 80px white circle + slow-spin */}
-        <div
-          style={{
-            width: 80, height: 80, borderRadius: '50%',
-            background: '#ffffff',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-        >
-          <span className="animate-slow-spin inline-flex" style={{ color: '#06B6D4' }}>
-            <Brain size={32} strokeWidth={1.6} />
-          </span>
-        </div>
-
-        {/* Title + context */}
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: '#000000', letterSpacing: '-0.015em' }}>
-            Synthesizing note
+          {/* Context line */}
+          <div style={{ textAlign: 'center', paddingBottom: 4 }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color: '#000000', letterSpacing: '-0.015em' }}>
+              Synthesizing note
+            </div>
+            <div style={{ fontSize: 13, color: '#8E8E93', marginTop: 5 }}>
+              {wordCount} words · {specialtyLabel} · {lengthLabel}
+            </div>
           </div>
-          <div style={{ fontSize: 13, color: '#8E8E93', marginTop: 6 }}>
-            {wordCount} words · {specialtyLabel} · {lengthLabel}
-          </div>
-        </div>
 
-        {/* S → O → A → P pipeline */}
-        <div className="apple-card w-full overflow-hidden">
-          {SOAP_META.map((s, i) => {
-            const done   = i < step;
-            const active = i === step;
-            return (
-              <div key={s.key}>
-                <div
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 12,
-                    padding: '0 16px',
-                    height: 56,
-                    opacity: i > step ? 0.30 : 1,
-                    transition: 'opacity 300ms',
-                  }}
-                >
-                  {/* 36px circle */}
-                  <div
-                    style={{
-                      width: 36, height: 36, borderRadius: '50%',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 14, fontWeight: 600,
-                      background: done ? 'rgba(52,199,89,0.12)' : active ? `${s.color}18` : 'rgba(120,120,128,0.10)',
-                      color: done ? '#34C759' : active ? s.color : '#8E8E93',
-                      position: 'relative', flexShrink: 0,
-                    }}
-                  >
-                    {done ? <Check size={15} /> : s.letter}
-                    {active && (
-                      <span
-                        className="absolute animate-pulse-dot"
-                        style={{ inset: -3, borderRadius: '50%', border: `1.5px solid ${s.color}50` }}
-                      />
-                    )}
-                  </div>
+          {/* 4 skeleton / done cards */}
+          {SOAP_META.map((s, i) => (
+            <SkeletonCard
+              key={s.key}
+              section={s}
+              done={i < step}
+              active={i === step}
+            />
+          ))}
 
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 16, fontWeight: 500, color: '#000000' }}>{s.title}</div>
-                    <div style={{ fontSize: 12, color: '#8E8E93', marginTop: 1 }}>
-                      {done ? 'Synthesized' : active ? 'Writing…' : 'Pending'}
-                    </div>
-                  </div>
-
-                  {done && (
-                    <span style={{ fontSize: 11, fontWeight: 600, color: '#34C759', background: 'rgba(52,199,89,0.12)', padding: '3px 9px', borderRadius: 99 }}>
-                      OK
-                    </span>
-                  )}
-                </div>
-                {/* Ultra-subtle #F2F2F7 divider */}
-                {i < SOAP_META.length - 1 && (
-                  <div style={{ height: 1, background: '#F2F2F7', marginLeft: 16 }} />
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Elapsed + Groq chip */}
-        <div className="apple-card w-full" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Activity size={14} style={{ color: '#06B6D4' }} />
-            <span style={{ fontSize: 14, color: '#000000', fontVariantNumeric: 'tabular-nums' }}>
-              {(tick / 1000).toFixed(1)}s elapsed
+          {/* Elapsed + Groq chip */}
+          <div className="apple-card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Activity size={14} style={{ color: '#06B6D4' }} />
+              <span style={{ fontSize: 14, color: '#000000', fontVariantNumeric: 'tabular-nums' }}>
+                {(tick / 1000).toFixed(1)}s elapsed
+              </span>
+            </div>
+            <span
+              style={{
+                fontSize: 11, fontWeight: 600, letterSpacing: '0.03em',
+                padding: '4px 10px', borderRadius: 99,
+                background: '#EFF9FF', border: '1px solid #BAE6FD', color: '#06B6D4',
+              }}
+            >
+              Groq · live
             </span>
           </div>
-          {/* Groq chip: #EFF9FF bg, #BAE6FD border, #06B6D4 text */}
-          <span
-            style={{
-              fontSize: 11, fontWeight: 600, letterSpacing: '0.03em',
-              padding: '4px 10px', borderRadius: 99,
-              background: '#EFF9FF',
-              border: '1px solid #BAE6FD',
-              color: '#06B6D4',
-            }}
-          >
-            Groq · {specialtyLabel}
-          </span>
-        </div>
 
+        </div>
       </div>
 
       <div style={{ textAlign: 'center', padding: '8px 0 16px' }}>

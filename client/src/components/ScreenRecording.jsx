@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Lock } from 'lucide-react';
 import BrandRow from './BrandRow.jsx';
 import MicCore from './MicCore.jsx';
-import Waveform from './Waveform.jsx';
+import AudioWaveform from './AudioWaveform.jsx';
 
 const vibrate = (pattern) => { try { navigator.vibrate?.(pattern); } catch {} };
 
@@ -11,9 +11,9 @@ function fmtTime(s) {
 }
 
 export default function ScreenRecording({ transcript, setTranscript, onStop, onCancel, showToast }) {
-  const [seconds,   setSeconds]   = useState(0);
-  const [interim,   setInterim]   = useState('');
-  const [recError,  setRecError]  = useState('');
+  const [seconds,  setSeconds]  = useState(0);
+  const [interim,  setInterim]  = useState('');
+  const [recError, setRecError] = useState('');
   const recognitionRef    = useRef(null);
   const shouldContinueRef = useRef(false);
   const startedAtRef      = useRef(Date.now());
@@ -85,7 +85,7 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
       <BrandRow state="recording" />
 
       <div className="flex-1 overflow-y-auto scroll-thin">
-        <div className="flex flex-col items-center px-4 pt-6 pb-6 gap-5">
+        <div className="flex flex-col items-center px-4 pt-6 pb-8 gap-5">
 
           {/* Timer */}
           <div style={{ textAlign: 'center' }}>
@@ -103,7 +103,7 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
               {fmtTime(seconds)}
             </div>
 
-            {/* Status label: pulsing red dot + grey text */}
+            {/* Pulsing red dot status */}
             <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
               {!recError && (
                 <span
@@ -117,13 +117,15 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
             </div>
           </div>
 
-          {/* Orb */}
+          {/* Orb — tapping it is the primary stop action */}
           <MicCore recording onTap={handleStop} size={110} />
 
-          {/* Waveform */}
-          <Waveform active={!recError} count={44} color="#C6C6C8" height={40} />
+          {/* Real-time audio waveform */}
+          <div style={{ width: '100%', borderRadius: 12, overflow: 'hidden', background: '#ffffff', padding: '12px 16px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <AudioWaveform active={!recError} height={56} />
+          </div>
 
-          {/* Live transcript card — section header above */}
+          {/* Live transcript card */}
           <div style={{ width: '100%' }}>
             <div style={{ paddingLeft: 4, marginBottom: 8 }}>
               <span style={{ fontSize: 11, fontWeight: 600, color: '#8E8E93', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
@@ -132,7 +134,6 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
             </div>
 
             <div className="apple-card w-full" style={{ padding: '16px 18px' }}>
-              {/* Word count chip inside card top-right */}
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
                 <span
                   style={{
@@ -146,7 +147,7 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
                 </span>
               </div>
 
-              <div style={{ minHeight: 160, position: 'relative', overflow: 'hidden' }}>
+              <div style={{ minHeight: 140, position: 'relative', overflow: 'hidden' }}>
                 {recError ? (
                   <p style={{ margin: 0, fontSize: 14, color: '#FF3B30', lineHeight: 1.55 }}>{recError}</p>
                 ) : lines.length === 0 ? (
@@ -176,10 +177,11 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
             </div>
           </div>
 
-          {/* Cancel: white pill card */}
+          {/* Buttons: Cancel (white card) + Stop & generate (secondary grey, smaller) */}
           <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
             <button
               onClick={onCancel}
+              className="tap-scale"
               style={{
                 width: '100%',
                 padding: '15px 24px',
@@ -191,22 +193,26 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
                 color: '#000000',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)',
                 cursor: 'pointer',
-                transition: 'opacity 120ms ease, transform 120ms ease',
-                WebkitTapHighlightColor: 'transparent',
               }}
-              onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.98)'; e.currentTarget.style.opacity = '0.80'; }}
-              onMouseUp={(e)   => { e.currentTarget.style.transform = ''; e.currentTarget.style.opacity = ''; }}
-              onTouchStart={(e) => { e.currentTarget.style.transform = 'scale(0.98)'; e.currentTarget.style.opacity = '0.80'; }}
-              onTouchEnd={(e)   => { e.currentTarget.style.transform = ''; e.currentTarget.style.opacity = ''; }}
             >
               Cancel
             </button>
 
-            {/* Stop: full-width cyan 52px */}
+            {/* Secondary: Stop & generate — smaller, grey */}
             <button
-              className="btn-primary"
               onClick={handleStop}
-              style={{ width: '100%', height: 52, borderRadius: 14, fontSize: 16 }}
+              className="tap-scale"
+              style={{
+                width: '100%',
+                padding: '12px 24px',
+                borderRadius: 14,
+                fontSize: 14,
+                fontWeight: 500,
+                background: 'rgba(120,120,128,0.12)',
+                border: 'none',
+                color: '#8E8E93',
+                cursor: 'pointer',
+              }}
             >
               Stop &amp; generate
             </button>

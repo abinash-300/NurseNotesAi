@@ -1,7 +1,7 @@
-import React from 'react';
-import { ChevronRight, Activity, Zap, Lock, Smartphone } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ChevronRight, Activity, Mic, Smartphone, Lock } from 'lucide-react';
 import BrandRow from './BrandRow.jsx';
-import MicCore from './MicCore.jsx';
+import ProfileSheet from './ProfileSheet.jsx';
 
 const speechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
@@ -49,17 +49,72 @@ export default function ScreenIdle({
   specialty = 'general', onSpecialtyChange,
   noteLength = 'standard', onNoteLengthChange,
 }) {
+  const [showProfile, setShowProfile] = useState(false);
+  const [scrolled,    setScrolled]    = useState(false);
+  const scrollRef     = useRef(null);
+  const largeTitleRef = useRef(null);
+
+  /* Large-title scroll detection via IntersectionObserver */
+  useEffect(() => {
+    const sentinel = largeTitleRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setScrolled(!entry.isIntersecting),
+      { threshold: 0 },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="screen">
-      <BrandRow state="idle" />
+      <BrandRow state="idle" onProfile={() => setShowProfile(true)} />
 
-      <div className="flex-1 overflow-y-auto scroll-thin">
-        <div className="flex flex-col gap-5 px-4 pt-5 pb-10">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto scroll-thin">
+        <div className="flex flex-col gap-5 px-4 pb-12">
 
-          {/* ── Mic hero card ──────────────────────────────── */}
+          {/* ── Large navigation title ──────────────────────── */}
+          <div ref={largeTitleRef} style={{ paddingTop: 20 }}>
+            <div
+              style={{
+                fontSize: 34,
+                fontWeight: 800,
+                color: '#000000',
+                letterSpacing: '-0.025em',
+                lineHeight: 1,
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+              }}
+            >
+              NurseNote
+            </div>
+            <div style={{ fontSize: 14, color: '#8E8E93', marginTop: 5 }}>
+              Voice-to-SOAP in seconds
+            </div>
+          </div>
+
+          {/* ── Mic hero ───────────────────────────────────── */}
           {speechSupported ? (
-            <div className="apple-card flex flex-col items-center gap-5 py-10 px-6">
-              <MicCore onTap={onStart} size={140} />
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22 }}>
+              {/* Glassmorphism card */}
+              <button
+                onClick={onStart}
+                aria-label="Start recording"
+                className="animate-mic-glow tap-scale"
+                style={{
+                  width: 180, height: 180,
+                  borderRadius: 32,
+                  background: 'rgba(255,255,255,0.72)',
+                  backdropFilter: 'blur(20px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                  border: '1px solid rgba(255,255,255,0.80)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer',
+                }}
+              >
+                <Mic size={48} strokeWidth={1.5} style={{ color: '#06B6D4' }} />
+              </button>
+
+              {/* Text below card */}
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 28, fontWeight: 700, color: '#000000', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
                   Press to begin
@@ -85,7 +140,7 @@ export default function ScreenIdle({
                 </div>
               </div>
               <button className="btn-primary w-full" onClick={onDemo}>
-                <Zap size={16} /> Try demo patient
+                Try demo patient
               </button>
             </div>
           )}
@@ -94,11 +149,10 @@ export default function ScreenIdle({
           <div>
             <SectionHeader>Specialty</SectionHeader>
             <div className="apple-card" style={{ padding: '14px 16px' }}>
-              {/* Horizontally scrollable chips with right fade */}
               <div style={{ position: 'relative' }}>
                 <div
                   className="no-scrollbar"
-                  style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingRight: 20 }}
+                  style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingRight: 32 }}
                 >
                   {SPECIALTIES.map((s) => {
                     const active = specialty === s.key;
@@ -106,6 +160,7 @@ export default function ScreenIdle({
                       <button
                         key={s.key}
                         onClick={() => onSpecialtyChange(s.key)}
+                        className="tap-scale"
                         style={{
                           height: 34,
                           padding: '0 16px',
@@ -114,11 +169,11 @@ export default function ScreenIdle({
                           fontWeight: active ? 600 : 400,
                           border: 'none',
                           flexShrink: 0,
-                          background: active ? 'rgba(6,182,212,0.12)' : 'rgba(120,120,128,0.10)',
-                          color: active ? '#06B6D4' : '#000000',
+                          background: active ? '#06B6D4' : '#F2F2F7',
+                          color: active ? '#FFFFFF' : '#8E8E93',
+                          boxShadow: active ? '0 2px 8px rgba(6,182,212,0.30)' : 'none',
                           cursor: 'pointer',
-                          transition: 'all 140ms ease',
-                          WebkitTapHighlightColor: 'transparent',
+                          transition: 'background 140ms ease, color 140ms ease, box-shadow 140ms ease',
                         }}
                       >
                         {s.label}
@@ -126,10 +181,10 @@ export default function ScreenIdle({
                     );
                   })}
                 </div>
-                {/* Right-edge fade hint */}
+                {/* Right-edge fade */}
                 <div
                   style={{
-                    position: 'absolute', top: 0, right: 0, bottom: 0, width: 36,
+                    position: 'absolute', top: 0, right: 0, bottom: 0, width: 32,
                     background: 'linear-gradient(to right, transparent, #ffffff)',
                     pointerEvents: 'none',
                   }}
@@ -156,6 +211,7 @@ export default function ScreenIdle({
                     <button
                       key={opt.key}
                       onClick={() => onNoteLengthChange(opt.key)}
+                      className="tap-scale"
                       style={{
                         flex: 1,
                         padding: '9px 4px',
@@ -168,7 +224,6 @@ export default function ScreenIdle({
                         boxShadow: active ? '0 1px 4px rgba(0,0,0,0.12)' : 'none',
                         cursor: 'pointer',
                         transition: 'all 140ms ease',
-                        WebkitTapHighlightColor: 'transparent',
                       }}
                     >
                       {opt.label}
@@ -198,6 +253,7 @@ export default function ScreenIdle({
                   <div key={session.id}>
                     <button
                       onClick={() => onOpenSession(session)}
+                      className="tap-scale"
                       style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                         width: '100%', padding: '13px 16px',
@@ -222,21 +278,6 @@ export default function ScreenIdle({
             </div>
           </div>
 
-          {/* ── Demo text link ─────────────────────────────── */}
-          {speechSupported && (
-            <button
-              onClick={onDemo}
-              style={{
-                alignSelf: 'center',
-                background: 'none', border: 'none', cursor: 'pointer',
-                fontSize: 14, color: '#8E8E93', padding: '2px 0',
-                WebkitTapHighlightColor: 'transparent',
-              }}
-            >
-              Try with a demo patient →
-            </button>
-          )}
-
           {/* ── Privacy footer ─────────────────────────────── */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
             <Lock size={10} style={{ color: '#C7C7CC' }} />
@@ -247,6 +288,14 @@ export default function ScreenIdle({
 
         </div>
       </div>
+
+      {/* Profile bottom sheet */}
+      {showProfile && (
+        <ProfileSheet
+          onDemo={onDemo}
+          onClose={() => setShowProfile(false)}
+        />
+      )}
     </div>
   );
 }

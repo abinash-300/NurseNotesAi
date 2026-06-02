@@ -1,26 +1,22 @@
 import React from 'react';
-import { Shield } from 'lucide-react';
+import { Shield, User } from 'lucide-react';
 
 const STATE_BADGE = {
-  idle: {
-    label: 'HIPAA',
-    bg: '#F0FDF4', border: '1px solid #BBF7D0', color: '#15803D',
-    icon: 'shield', pulse: false,
-  },
   recording: {
     label: 'REC',
     bg: 'rgba(255,59,48,0.10)', border: 'none', color: '#FF3B30',
-    icon: null, pulse: true,
+    pulse: true,
   },
   processing: {
     label: 'PROCESSING',
     bg: 'rgba(6,182,212,0.10)', border: 'none', color: '#06B6D4',
-    icon: null, pulse: true,
+    pulse: true,
   },
 };
 
-export default function BrandRow({ state = 'idle' }) {
-  const { label, bg, border, color, icon, pulse } = STATE_BADGE[state] ?? STATE_BADGE.idle;
+export default function BrandRow({ state = 'idle', onProfile }) {
+  const badge = STATE_BADGE[state];
+
   return (
     <div
       className="relative z-10 flex items-center justify-between px-5"
@@ -38,18 +34,37 @@ export default function BrandRow({ state = 'idle' }) {
         NurseNote
       </span>
 
-      <span
-        style={{
-          display: 'inline-flex', alignItems: 'center', gap: 5,
-          fontSize: 11, fontWeight: 600, letterSpacing: '0.03em',
-          padding: '6px 12px', borderRadius: 20,
-          background: bg, border, color,
-        }}
-      >
-        {icon === 'shield' && <Shield size={12} strokeWidth={2.5} />}
-        {pulse && <span className="dot animate-pulse-dot" />}
-        {label}
-      </span>
+      {/* idle: profile avatar */}
+      {state === 'idle' && (
+        <button
+          onClick={onProfile}
+          aria-label="Profile & settings"
+          className="tap-scale"
+          style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: '#F2F2F7', border: 'none',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', color: '#8E8E93',
+          }}
+        >
+          <User size={18} strokeWidth={1.8} />
+        </button>
+      )}
+
+      {/* recording / processing: state badge */}
+      {badge && (
+        <span
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            fontSize: 11, fontWeight: 600, letterSpacing: '0.03em',
+            padding: '6px 12px', borderRadius: 20,
+            background: badge.bg, border: badge.border, color: badge.color,
+          }}
+        >
+          {badge.pulse && <span className="dot animate-pulse-dot" />}
+          {badge.label}
+        </span>
+      )}
     </div>
   );
 }

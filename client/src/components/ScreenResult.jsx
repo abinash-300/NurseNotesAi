@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Copy, Check, Edit2, Flag, Share2, Plus, X } from 'lucide-react';
-import BrandRow from './BrandRow.jsx';
 
 const vibrate = (pattern) => { try { navigator.vibrate?.(pattern); } catch {} };
 
@@ -24,17 +23,11 @@ function timeAgo(ts) {
   return `${Math.floor(secs / 3600)}h ago`;
 }
 
-function fmtCountdown(secs) {
-  const m = Math.floor(secs / 60);
-  const s = secs % 60;
-  return `${m}:${s.toString().padStart(2, '0')}`;
-}
-
 const SOAP_META = [
-  { key: 'subjective', letter: 'S', title: 'Subjective', color: '#f97316' },
-  { key: 'objective',  letter: 'O', title: 'Objective',  color: '#06B6D4' },
-  { key: 'assessment', letter: 'A', title: 'Assessment', color: '#a855f7' },
-  { key: 'plan',       letter: 'P', title: 'Plan',       color: '#22C55E' },
+  { key: 'subjective', letter: 'S', title: 'Subjective', color: '#f97316', tint: 'rgba(249,115,22,0.05)'  },
+  { key: 'objective',  letter: 'O', title: 'Objective',  color: '#06B6D4', tint: 'rgba(6,182,212,0.05)'   },
+  { key: 'assessment', letter: 'A', title: 'Assessment', color: '#a855f7', tint: 'rgba(168,85,247,0.05)'  },
+  { key: 'plan',       letter: 'P', title: 'Plan',       color: '#22C55E', tint: 'rgba(34,197,94,0.05)'   },
 ];
 
 function SoapCard({ section, body, index, onSave, flagged, onFlag }) {
@@ -61,23 +54,23 @@ function SoapCard({ section, body, index, onSave, flagged, onFlag }) {
 
   return (
     <div
-      className="animate-rise-in apple-card"
+      className="animate-rise-in"
       style={{
-        animationDelay: `${index * 80}ms`,
+        /* Subtle background tint per section — no left border */
+        background: flagged ? '#FFFBEB' : section.tint,
+        borderRadius: 20,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)',
         overflow: 'hidden',
+        animationDelay: `${index * 80}ms`,
+        transition: 'background 200ms ease',
       }}
     >
-      {/* Card header row */}
-      <div
-        style={{
-          display: 'flex', alignItems: 'center',
-          padding: '16px 18px 12px',
-        }}
-      >
-        {/* Letter — 22px, section color */}
+      {/* Header row — 20px padding all sides */}
+      <div style={{ display: 'flex', alignItems: 'center', padding: '20px 20px 0' }}>
+        {/* Letter — 24px bold */}
         <span
           style={{
-            fontSize: 22, fontWeight: 700, flexShrink: 0, lineHeight: 1,
+            fontSize: 24, fontWeight: 700, flexShrink: 0, lineHeight: 1,
             color: accentColor,
             transition: 'color 200ms ease',
             marginRight: 10,
@@ -86,7 +79,6 @@ function SoapCard({ section, body, index, onSave, flagged, onFlag }) {
           {section.letter}
         </span>
 
-        {/* Title + word count */}
         <div style={{ flex: 1, lineHeight: 1.2 }}>
           <div style={{ fontSize: 17, fontWeight: 700, color: '#000000' }}>{section.title}</div>
           <div style={{ fontSize: 11, color: '#8E8E93', marginTop: 2 }}>
@@ -94,62 +86,47 @@ function SoapCard({ section, body, index, onSave, flagged, onFlag }) {
           </div>
         </div>
 
-        {/* Action icons — 18px, no background */}
         {editing ? (
           <button
             onClick={cancel}
             aria-label="Cancel edit"
+            className="tap-scale"
             style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#8E8E93' }}
           >
             <X size={16} />
           </button>
         ) : (
           <div style={{ display: 'flex', gap: 2 }}>
-            <button
-              onClick={copy}
-              aria-label="Copy"
-              style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: copied ? '#34C759' : '#C7C7CC', WebkitTapHighlightColor: 'transparent' }}
-            >
+            <button onClick={copy} aria-label="Copy" className="tap-scale"
+              style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: copied ? '#34C759' : '#C7C7CC' }}>
               {copied ? <Check size={16} /> : <Copy size={16} />}
             </button>
-            <button
-              onClick={startEdit}
-              aria-label="Edit"
-              style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#C7C7CC', WebkitTapHighlightColor: 'transparent' }}
-            >
+            <button onClick={startEdit} aria-label="Edit" className="tap-scale"
+              style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#C7C7CC' }}>
               <Edit2 size={16} />
             </button>
-            <button
-              onClick={onFlag}
-              aria-label={flagged ? 'Remove flag' : 'Flag for review'}
-              style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: flagged ? '#F59E0B' : '#C7C7CC', transition: 'color 150ms ease', WebkitTapHighlightColor: 'transparent' }}
-            >
+            <button onClick={onFlag} aria-label={flagged ? 'Remove flag' : 'Flag for review'} className="tap-scale"
+              style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: flagged ? '#F59E0B' : '#C7C7CC', transition: 'color 150ms ease' }}>
               <Flag size={16} fill={flagged ? '#F59E0B' : 'none'} />
             </button>
           </div>
         )}
       </div>
 
-      {/* 0.5px divider in #F2F2F7 */}
-      <div style={{ height: 0.5, background: '#F2F2F7', marginLeft: 18 }} />
-
       {/* Needs review chip */}
       {flagged && (
-        <div style={{ padding: '10px 18px 0' }}>
-          <span
-            style={{
-              fontSize: 10, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase',
-              padding: '3px 8px', borderRadius: 99,
-              background: '#FEF3C7', border: '1px solid #F59E0B', color: '#92400E',
-            }}
-          >
+        <div style={{ padding: '8px 20px 0' }}>
+          <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 99, background: '#FEF3C7', border: '1px solid #F59E0B', color: '#92400E' }}>
             Needs Review
           </span>
         </div>
       )}
 
-      {/* Body — 16px top padding */}
-      <div style={{ padding: '16px 18px 18px' }}>
+      {/* Divider */}
+      <div style={{ height: 0.5, background: 'rgba(0,0,0,0.06)', margin: '12px 20px 0' }} />
+
+      {/* Body — 20px padding, line-height 1.7 */}
+      <div style={{ padding: '16px 20px 20px' }}>
         {editing ? (
           <>
             <textarea
@@ -158,10 +135,10 @@ function SoapCard({ section, body, index, onSave, flagged, onFlag }) {
               autoFocus
               style={{
                 display: 'block', width: '100%', minHeight: 96,
-                background: '#F2F2F7',
+                background: 'rgba(255,255,255,0.70)',
                 border: `1.5px solid ${section.color}`,
                 borderRadius: 12, color: '#000000',
-                fontSize: 15, lineHeight: 1.6,
+                fontSize: 15, lineHeight: 1.7,
                 fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
                 padding: '10px 12px', resize: 'vertical',
                 outline: 'none', boxSizing: 'border-box',
@@ -177,7 +154,7 @@ function SoapCard({ section, body, index, onSave, flagged, onFlag }) {
             </div>
           </>
         ) : (
-          <p style={{ margin: 0, fontSize: 15, lineHeight: 1.65, color: '#000000', fontWeight: 400 }}>{body}</p>
+          <p style={{ margin: 0, fontSize: 15, lineHeight: 1.7, color: '#000000', fontWeight: 400 }}>{body}</p>
         )}
       </div>
     </div>
@@ -217,8 +194,7 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
     vibrate(20);
     setFlaggedKeys((prev) => {
       const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
+      if (next.has(key)) next.delete(key); else next.add(key);
       return next;
     });
   };
@@ -236,10 +212,7 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
     .join('\n\n');
 
   const copyFull = async () => {
-    if (flaggedKeys.size > 0) {
-      setCopyConfirm(true);
-      return;
-    }
+    if (flaggedKeys.size > 0) { setCopyConfirm(true); return; }
     vibrate(30);
     try { await navigator.clipboard.writeText(fullNote); } catch {}
     setFullCopied(true);
@@ -257,32 +230,38 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
   const handleShare = async () => {
     const title = `NurseNote AI — Session #${sessionNumber}`;
     if (navigator.share) {
-      try {
-        await navigator.share({ title, text: fullNote });
-      } catch (err) {
-        if (err.name !== 'AbortError') showToast?.('Share failed. Try the copy button instead.');
-      }
+      try { await navigator.share({ title, text: fullNote }); }
+      catch (err) { if (err.name !== 'AbortError') showToast?.('Share failed. Try the copy button instead.'); }
     } else {
       try { await navigator.clipboard.writeText(fullNote); } catch {}
       showToast?.('Copied to clipboard');
     }
   };
 
-  const secs           = ((meta?.ms ?? 0) / 1000).toFixed(2);
-  const wordsIn        = meta?.wordsIn       ?? 0;
-  const wordsOut       = meta?.wordsOut      ?? 0;
-  const sessionNumber  = meta?.sessionNumber ?? '—';
-  const timestamp      = timeAgo(meta?.createdAt);
-  const specialtyLabel = SPECIALTY_LABELS[meta?.specialty]  ?? 'General';
-  const lengthLabel    = LENGTH_LABELS[meta?.noteLength]    ?? 'Standard';
+  const secs          = ((meta?.ms ?? 0) / 1000).toFixed(2);
+  const wordsIn       = meta?.wordsIn      ?? 0;
+  const wordsOut      = meta?.wordsOut     ?? 0;
+  const sessionNumber = meta?.sessionNumber ?? '—';
+  const timestamp     = timeAgo(meta?.createdAt);
+  const specialtyLabel = SPECIALTY_LABELS[meta?.specialty] ?? 'General';
+  const lengthLabel    = LENGTH_LABELS[meta?.noteLength]   ?? 'Standard';
 
   return (
     <div className="screen">
 
-      {/* Header */}
-      <BrandRow state="idle" />
+      {/* 3px draining progress bar — very top, full width, no text */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, zIndex: 30, background: '#F2F2F7' }}>
+        <div
+          style={{
+            height: '100%',
+            width: `${(remaining / CLEAR_SECS) * 100}%`,
+            background: timerColor,
+            transition: 'width 1s linear, background 600ms ease',
+          }}
+        />
+      </div>
 
-      {/* Header nav row with white circle buttons */}
+      {/* Nav header */}
       <div
         style={{
           background: '#ffffff',
@@ -292,11 +271,7 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
           position: 'relative', zIndex: 10,
         }}
       >
-        <button
-          className="btn-icon"
-          onClick={onNew}
-          aria-label="Back"
-        >
+        <button className="btn-icon" onClick={onNew} aria-label="Back">
           <ArrowLeft size={16} />
         </button>
 
@@ -304,75 +279,14 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
           <div style={{ fontSize: 17, fontWeight: 700, color: '#000000' }}>
             Session #{sessionNumber}
           </div>
-          <div style={{ fontSize: 12, color: '#8E8E93', marginTop: 2 }}>
-            {timestamp} · {wordsIn} words in
+          {/* Single metadata line */}
+          <div style={{ fontSize: 13, color: '#8E8E93', marginTop: 3 }}>
+            {wordsIn} words · {specialtyLabel} · Vitals captured
           </div>
         </div>
 
-        {/* Spacer to balance the back button */}
+        {/* Spacer */}
         <div style={{ width: 36 }} />
-      </div>
-
-      {/* Clear timer — white pill card + 2px progress bar below */}
-      <div style={{ padding: '10px 16px 0', position: 'relative', zIndex: 10 }}>
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: 12,
-            padding: '10px 14px',
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)',
-            overflow: 'hidden',
-            position: 'relative',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span
-              style={{ width: 6, height: 6, borderRadius: '50%', background: timerColor, display: 'inline-block', flexShrink: 0, transition: 'background 600ms ease' }}
-            />
-            <span style={{ fontSize: 13, fontWeight: 500, color: '#000000' }}>
-              Clears in {fmtCountdown(remaining)}
-            </span>
-          </div>
-          <span style={{ fontSize: 11, color: '#8E8E93' }}>Privacy auto-clear</span>
-        </div>
-        {/* 2px progress bar below the pill */}
-        <div style={{ height: 2, background: '#F2F2F7', borderRadius: '0 0 2px 2px', overflow: 'hidden', marginTop: 2 }}>
-          <div
-            style={{
-              height: '100%',
-              width: `${(remaining / CLEAR_SECS) * 100}%`,
-              background: timerColor,
-              transition: 'width 1s linear, background 600ms ease',
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Context chips — horizontal scroll white card */}
-      <div style={{ padding: '8px 16px 6px', position: 'relative', zIndex: 10 }}>
-        <div
-          className="no-scrollbar"
-          style={{ display: 'flex', gap: 6, overflowX: 'auto', padding: '2px 0' }}
-        >
-          {[specialtyLabel, lengthLabel, 'Vitals captured'].map((label) => (
-            <span
-              key={label}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 4,
-                flexShrink: 0,
-                background: '#ffffff',
-                border: '0.5px solid #E5E5EA',
-                borderRadius: 99,
-                padding: '5px 12px',
-                fontSize: 12, fontWeight: 500, color: '#000000',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-              }}
-            >
-              {label}
-            </span>
-          ))}
-        </div>
       </div>
 
       {/* Scrollable SOAP cards */}
@@ -381,7 +295,7 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
         style={{
           flex: 1, overflowY: 'auto', position: 'relative', zIndex: 10,
           display: 'flex', flexDirection: 'column', gap: 10,
-          padding: '4px 16px',
+          padding: '12px 16px',
           paddingBottom: 'calc(110px + env(safe-area-inset-bottom))',
         }}
       >
@@ -397,23 +311,20 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
           />
         ))}
 
-        {/* Meta panel — 4-stat grid */}
-        <div
-          className="apple-card"
-          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}
-        >
+        {/* Meta grid */}
+        <div className="apple-card" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
           {[
-            { label: 'Generated in', value: `${secs}s`                },
-            { label: 'Model',        value: 'llama-3.1-8b'             },
-            { label: 'Confidence',   value: 'High · 94%',  green: true },
-            { label: 'Words',        value: `${wordsIn} in / ${wordsOut} out` },
+            { label: 'Generated in', value: `${secs}s`                           },
+            { label: 'Model',        value: 'llama-3.1-8b'                        },
+            { label: 'Confidence',   value: 'High · 94%',         green: true     },
+            { label: 'Words',        value: `${wordsIn} in / ${wordsOut} out`     },
           ].map(({ label, value, green }, idx) => (
             <div
               key={label}
               style={{
                 padding: '14px 16px',
-                borderRight: idx % 2 === 0 ? '0.5px solid #F2F2F7' : 'none',
-                borderBottom: idx < 2 ? '0.5px solid #F2F2F7' : 'none',
+                borderRight:  idx % 2 === 0 ? '0.5px solid #F2F2F7' : 'none',
+                borderBottom: idx < 2       ? '0.5px solid #F2F2F7' : 'none',
               }}
             >
               <div style={{ fontSize: 11, color: '#8E8E93', marginBottom: 4, fontWeight: 500 }}>{label}</div>
@@ -423,6 +334,13 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
             </div>
           ))}
         </div>
+
+        {/* Timestamp footer */}
+        <div style={{ textAlign: 'center', paddingTop: 4 }}>
+          <span style={{ fontSize: 11, color: '#C7C7CC', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            {timestamp} · clears in {Math.floor(remaining / 60)}:{String(remaining % 60).padStart(2,'0')}
+          </span>
+        </div>
       </div>
 
       {/* Flag-copy confirmation overlay */}
@@ -431,10 +349,8 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
           style={{
             position: 'absolute', left: 12, right: 12, zIndex: 30,
             bottom: 'calc(96px + env(safe-area-inset-bottom))',
-            background: '#FFFBEB',
-            border: '1px solid #F59E0B',
-            borderRadius: 20,
-            padding: '16px 18px',
+            background: '#FFFBEB', border: '1px solid #F59E0B',
+            borderRadius: 20, padding: '16px 18px',
             boxShadow: '0 4px 20px rgba(245,158,11,0.18)',
           }}
         >
@@ -458,44 +374,24 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
         </div>
       )}
 
-      {/* Sticky bottom bar — order: [+New] [Copy full note] [Share] */}
+      {/* Sticky bottom bar — [+New] [Copy full note] [Share] */}
       <div
         style={{
           position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 20,
           display: 'flex', alignItems: 'center', gap: 10,
           padding: '12px 16px',
           paddingBottom: 'calc(12px + env(safe-area-inset-bottom))',
-          background: '#ffffff',
-          borderTop: '0.5px solid #C6C6C8',
+          background: '#ffffff', borderTop: '0.5px solid #C6C6C8',
         }}
       >
-        {/* + New */}
-        <button
-          className="btn-icon"
-          onClick={onNew}
-          aria-label="New session"
-          style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0 }}
-        >
+        <button className="btn-icon" onClick={onNew} aria-label="New session" style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0 }}>
           <Plus size={18} />
         </button>
-
-        {/* Copy full note — primary, grows */}
-        <button
-          className="btn-primary"
-          onClick={copyFull}
-          style={{ flex: 1, padding: '14px 18px', borderRadius: 14, fontSize: 16 }}
-        >
+        <button className="btn-primary" onClick={copyFull} style={{ flex: 1, padding: '14px 18px', borderRadius: 14, fontSize: 16 }}>
           {fullCopied ? <Check size={16} /> : <Copy size={16} />}
           {fullCopied ? 'Copied!' : 'Copy full note'}
         </button>
-
-        {/* Share */}
-        <button
-          className="btn-icon"
-          onClick={handleShare}
-          aria-label="Share"
-          style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0 }}
-        >
+        <button className="btn-icon" onClick={handleShare} aria-label="Share" style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0 }}>
           <Share2 size={18} />
         </button>
       </div>
