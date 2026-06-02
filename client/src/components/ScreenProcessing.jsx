@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Brain, Check, Activity, Shield } from 'lucide-react';
+import { Brain, Check, Activity } from 'lucide-react';
 import BrandRow from './BrandRow.jsx';
 
 const BASE_PROMPT = `You are an expert clinical documentation assistant specializing in nursing notes.
@@ -79,23 +79,20 @@ export default function ScreenProcessing({ transcript, specialty = 'general', no
   const [tick, setTick] = useState(0);
   const startedAt = useRef(Date.now());
 
-  const specialtyLabel = SPECIALTY_LABELS[specialty]  ?? 'General';
-  const lengthLabel    = LENGTH_LABELS[noteLength]     ?? 'Standard';
+  const specialtyLabel = SPECIALTY_LABELS[specialty] ?? 'General';
+  const lengthLabel    = LENGTH_LABELS[noteLength]   ?? 'Standard';
 
-  // Cosmetic pipeline — one step every 550 ms
   useEffect(() => {
     if (step >= SOAP_META.length - 1) return;
     const t = setTimeout(() => setStep((s) => s + 1), 550);
     return () => clearTimeout(t);
   }, [step]);
 
-  // Elapsed ticker
   useEffect(() => {
     const t = setInterval(() => setTick(Date.now() - startedAt.current), 100);
     return () => clearInterval(t);
   }, []);
 
-  // Real API call
   useEffect(() => {
     let cancelled = false;
     const words = transcript.trim().split(/\s+/).filter(Boolean);
@@ -112,10 +109,10 @@ export default function ScreenProcessing({ transcript, specialty = 'general', no
         const meta = {
           ms:         elapsed,
           model:      MODEL,
-          specialty:  specialty,
-          noteLength: noteLength,
-          wordsIn:    transcript.trim().split(/\s+/).length,
-          wordsOut:   Object.values(soap).join(' ').trim().split(/\s+/).length,
+          specialty,
+          noteLength,
+          wordsIn:  transcript.trim().split(/\s+/).length,
+          wordsOut: Object.values(soap).join(' ').trim().split(/\s+/).length,
         };
         const minDelay = (SOAP_META.length - 1) * 550 + 200;
         const wait = Math.max(0, minDelay - elapsed);
@@ -133,104 +130,100 @@ export default function ScreenProcessing({ transcript, specialty = 'general', no
     <div className="screen">
       <BrandRow state="processing" />
 
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-5 gap-[22px]">
-        {/* Spinning brain */}
-        <div className="text-center flex flex-col items-center gap-2 mt-3">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 gap-4">
+
+        {/* Brain + title */}
+        <div className="apple-card w-full flex flex-col items-center gap-4 py-8 px-6">
           <div
-            className="flex items-center justify-center"
             style={{
-              width: 64, height: 64, borderRadius: '50%',
-              background: '#ecfeff',
-              border: '1px solid #06B6D4',
+              width: 64, height: 64, borderRadius: 20,
+              background: 'rgba(6,182,212,0.10)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: '#06B6D4',
-              boxShadow: '0 0 0 6px rgba(6,182,212,0.08)',
             }}
           >
             <span className="animate-spin inline-flex"><Brain size={28} /></span>
           </div>
-          <h2
-            className="m-0 font-semibold"
-            style={{ fontSize: 22, letterSpacing: '-0.015em', color: '#111827' }}
-          >
-            Synthesizing note
-          </h2>
-          <span className="font-mono" style={{ fontSize: 11, letterSpacing: '0.06em', color: '#9CA3AF' }}>
-            {wordCount} words · {specialtyLabel} · {lengthLabel}
-          </span>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 24, fontWeight: 700, color: '#000000', letterSpacing: '-0.015em' }}>
+              Synthesizing note
+            </div>
+            <div style={{ fontSize: 13, color: '#8E8E93', marginTop: 4 }}>
+              {wordCount} words · {specialtyLabel} · {lengthLabel}
+            </div>
+          </div>
         </div>
 
         {/* S → O → A → P pipeline */}
-        <div
-          style={{
-            background: '#ffffff', border: '1px solid #D1D5DB',
-            borderRadius: 16, padding: '6px 4px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-          }}
-        >
+        <div className="apple-card w-full overflow-hidden">
           {SOAP_META.map((s, i) => {
             const done   = i < step;
             const active = i === step;
             return (
-              <div
-                key={s.key}
-                className="flex items-center gap-3.5 px-4 py-3.5"
-                style={{
-                  borderBottom: i < SOAP_META.length - 1 ? '1px solid #D1D5DB' : 'none',
-                  opacity: i > step ? 0.35 : 1,
-                  transition: 'opacity 300ms',
-                }}
-              >
+              <div key={s.key}>
                 <div
-                  className="flex items-center justify-center font-mono relative flex-shrink-0"
                   style={{
-                    width: 28, height: 28, borderRadius: '50%',
-                    fontSize: 13, fontWeight: 500,
-                    border: `1px solid ${done ? '#22C55E' : active ? s.color : '#D1D5DB'}`,
-                    background: done ? '#f0fdf4' : active ? `${s.color}14` : '#F3F4F6',
-                    color: done ? '#22C55E' : active ? s.color : '#9CA3AF',
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '14px 16px',
+                    opacity: i > step ? 0.30 : 1,
+                    transition: 'opacity 300ms',
                   }}
                 >
-                  {done ? <Check size={14} /> : s.letter}
-                  {active && (
-                    <span
-                      className="absolute animate-pulse-dot"
-                      style={{ inset: -3, borderRadius: '50%', border: `1px solid ${s.color}44` }}
-                    />
+                  <div
+                    style={{
+                      width: 30, height: 30, borderRadius: '50%',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 13, fontWeight: 600,
+                      background: done ? 'rgba(52,199,89,0.12)' : active ? `${s.color}18` : 'rgba(120,120,128,0.10)',
+                      color: done ? '#34C759' : active ? s.color : '#8E8E93',
+                      position: 'relative', flexShrink: 0,
+                    }}
+                  >
+                    {done ? <Check size={14} /> : s.letter}
+                    {active && (
+                      <span
+                        className="absolute animate-pulse-dot"
+                        style={{ inset: -3, borderRadius: '50%', border: `1.5px solid ${s.color}50` }}
+                      />
+                    )}
+                  </div>
+
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 16, fontWeight: 500, color: '#000000' }}>{s.title}</div>
+                    <div style={{ fontSize: 12, color: '#8E8E93', marginTop: 1 }}>
+                      {done ? 'Synthesized' : active ? 'Writing…' : 'Pending'}
+                    </div>
+                  </div>
+
+                  {done && (
+                    <span style={{ fontSize: 11, fontWeight: 600, color: '#34C759', background: 'rgba(52,199,89,0.12)', padding: '3px 9px', borderRadius: 99 }}>
+                      OK
+                    </span>
                   )}
                 </div>
-
-                <div className="flex flex-col flex-1">
-                  <span className="font-medium" style={{ fontSize: 14, color: '#111827' }}>{s.title}</span>
-                  <span className="font-mono" style={{ fontSize: 10, letterSpacing: '0.08em', color: '#9CA3AF' }}>
-                    {done ? 'Synthesized' : active ? 'Writing…' : 'Pending'}
-                  </span>
-                </div>
-                {done && <span className="chip chip-ok" style={{ fontSize: 9 }}>OK</span>}
+                {i < SOAP_META.length - 1 && <div className="list-sep" />}
               </div>
             );
           })}
         </div>
 
         {/* Elapsed */}
-        <div
-          className="flex items-center justify-between px-3.5 py-3 rounded-xl"
-          style={{ background: '#F3F4F6', border: '1px solid #D1D5DB' }}
-        >
-          <div className="flex items-center gap-2.5">
+        <div className="apple-card w-full" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <Activity size={14} style={{ color: '#06B6D4' }} />
-            <span style={{ fontSize: 12.5, color: '#6B7280' }}>
+            <span style={{ fontSize: 14, color: '#000000' }}>
               {(tick / 1000).toFixed(1)}s elapsed
             </span>
           </div>
-          <span className="chip chip-live" style={{ fontSize: 9 }}>
-            <span className="dot animate-pulse-dot" /> {specialtyLabel} template · Groq live
+          <span style={{ fontSize: 11, color: '#8E8E93' }}>
+            {specialtyLabel} · Groq
           </span>
         </div>
+
       </div>
 
-      <div className="relative z-10 flex items-center justify-center gap-2 py-3">
-        <Shield size={11} style={{ color: '#D1D5DB' }} />
-        <span className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.12em', color: '#D1D5DB' }}>
+      <div style={{ textAlign: 'center', padding: '8px 0 16px' }}>
+        <span style={{ fontSize: 11, color: '#C7C7CC', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           Encrypted in transit · Groq cloud
         </span>
       </div>

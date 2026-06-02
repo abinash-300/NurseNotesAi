@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Square, Pause } from 'lucide-react';
-
-const vibrate = (pattern) => { try { navigator.vibrate?.(pattern); } catch {} };
+import { Square } from 'lucide-react';
 import BrandRow from './BrandRow.jsx';
 import MicCore from './MicCore.jsx';
 import Waveform from './Waveform.jsx';
+
+const vibrate = (pattern) => { try { navigator.vibrate?.(pattern); } catch {} };
 
 function fmtTime(s) {
   return `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`;
@@ -14,11 +14,10 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
   const [seconds,   setSeconds]   = useState(0);
   const [interim,   setInterim]   = useState('');
   const [recError,  setRecError]  = useState('');
-  const recognitionRef   = useRef(null);
+  const recognitionRef    = useRef(null);
   const shouldContinueRef = useRef(false);
   const startedAtRef      = useRef(Date.now());
 
-  // Start recognition on mount, stop on unmount
   useEffect(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) {
@@ -26,9 +25,9 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
       return;
     }
     const r = new SR();
-    r.continuous      = true;
-    r.interimResults  = true;
-    r.lang            = 'en-US';
+    r.continuous     = true;
+    r.interimResults = true;
+    r.lang           = 'en-US';
 
     r.onresult = (event) => {
       let finalText = '', interimText = '';
@@ -57,7 +56,6 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
     };
   }, []);
 
-  // Timer
   useEffect(() => {
     startedAtRef.current = Date.now();
     const t = setInterval(
@@ -86,103 +84,96 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
     <div className="screen">
       <BrandRow state="recording" />
 
-      <div className="relative z-10 flex-1 flex flex-col items-center px-5 pt-3 gap-[18px]">
+      <div className="flex-1 flex flex-col items-center px-4 pt-5 gap-4 overflow-y-auto scroll-thin">
+
         {/* Timer */}
-        <div className="text-center flex flex-col gap-1">
-          <span
-            className="font-sans font-semibold tabular-nums"
-            style={{ fontSize: 52, letterSpacing: '-0.02em', color: '#111827', lineHeight: 1 }}
+        <div style={{ textAlign: 'center', paddingTop: 4 }}>
+          <div
+            style={{
+              fontSize: 64,
+              fontWeight: 800,
+              color: '#000000',
+              letterSpacing: '-0.03em',
+              lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+            }}
           >
             {fmtTime(seconds)}
-          </span>
-          <span className="eyebrow eyebrow-red flex items-center justify-center gap-1.5">
+          </div>
+          <div style={{ marginTop: 8 }}>
             <span
-              className="dot animate-pulse-dot"
-              style={{ background: '#f87171', boxShadow: '0 0 8px #f87171' }}
-            />
-            {recError ? 'Voice unavailable' : 'Recording — tap stop when done'}
-          </span>
-        </div>
-
-        <MicCore recording onTap={handleStop} size={110} />
-        <Waveform active={!recError} count={42} color="#6B7280" height={48} />
-
-        {/* Live transcript card */}
-        <div
-          className="w-full relative"
-          style={{
-            padding: '18px 20px', minHeight: 200, overflow: 'hidden',
-            background: '#F3F4F6', border: '1px solid #D1D5DB', borderRadius: 16,
-          }}
-        >
-          <div className="flex items-center justify-between mb-2.5">
-            <span className="eyebrow">Live transcript</span>
-            <span
-              className="font-mono flex items-center gap-1.5"
               style={{
-                fontSize: 9, padding: '4px 9px', borderRadius: 99,
-                background: '#ecfeff', border: '1px solid #06B6D4', color: '#06B6D4',
-                letterSpacing: '0.06em',
+                fontSize: 11, fontWeight: 600, letterSpacing: '0.10em', textTransform: 'uppercase',
+                color: recError ? '#FF3B30' : '#8E8E93',
               }}
             >
-              <span className="dot animate-pulse-dot" />
-              {wordCount} word{wordCount === 1 ? '' : 's'}
+              {recError ? 'Voice unavailable' : 'Recording — tap orb to stop'}
+            </span>
+          </div>
+        </div>
+
+        {/* Orb */}
+        <MicCore recording onTap={handleStop} size={110} />
+
+        {/* Waveform */}
+        <Waveform active={!recError} count={44} color="#C6C6C8" height={44} />
+
+        {/* Live transcript card */}
+        <div className="apple-card w-full" style={{ padding: '16px 18px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#8E8E93', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              Live Transcript
+            </span>
+            <span style={{ fontSize: 12, color: '#8E8E93' }}>
+              {wordCount} word{wordCount !== 1 ? 's' : ''}
             </span>
           </div>
 
-          {recError ? (
-            <p className="m-0 font-mono" style={{ fontSize: 12, color: '#ef4444', lineHeight: 1.55 }}>
-              {recError}
-            </p>
-          ) : lines.length === 0 ? (
-            <p className="m-0 italic" style={{ fontSize: 14, lineHeight: 1.55, color: '#9CA3AF' }}>
-              Listening… start speaking the patient report.
-              <span style={{ color: '#06B6D4' }}> ▍</span>
-            </p>
-          ) : (
-            <div className="flex flex-col gap-1.5">
-              {lines.map((line, i) => (
-                <p
-                  key={i}
-                  className="m-0"
-                  style={{
-                    fontSize: 14,
-                    color: '#374151',
-                    lineHeight: 1.45,
-                  }}
-                >
-                  {line}
-                  {i === lines.length - 1 && <span style={{ color: '#06B6D4' }}> ▍</span>}
-                </p>
-              ))}
-            </div>
-          )}
-
-          {/* Bottom fade */}
-          <div
-            className="absolute left-0 right-0 bottom-0 h-8 pointer-events-none"
-            style={{ background: 'linear-gradient(180deg, transparent, #F3F4F6)', borderRadius: '0 0 16px 16px' }}
-          />
+          <div style={{ minHeight: 180, position: 'relative', overflow: 'hidden' }}>
+            {recError ? (
+              <p style={{ margin: 0, fontSize: 14, color: '#FF3B30', lineHeight: 1.55 }}>{recError}</p>
+            ) : lines.length === 0 ? (
+              <p style={{ margin: 0, fontSize: 14, color: '#8E8E93', lineHeight: 1.55, fontStyle: 'italic' }}>
+                Listening… start speaking the patient report.
+                <span style={{ color: '#06B6D4' }}> ▍</span>
+              </p>
+            ) : (
+              <div>
+                {lines.map((line, i) => (
+                  <p key={i} style={{ margin: '0 0 5px', fontSize: 15, color: '#000000', lineHeight: 1.5 }}>
+                    {line}
+                    {i === lines.length - 1 && <span style={{ color: '#06B6D4' }}> ▍</span>}
+                  </p>
+                ))}
+              </div>
+            )}
+            <div
+              style={{
+                position: 'absolute', left: 0, right: 0, bottom: 0, height: 28,
+                background: 'linear-gradient(transparent, #ffffff)',
+                pointerEvents: 'none',
+                borderRadius: '0 0 20px 20px',
+              }}
+            />
+          </div>
         </div>
 
         {/* Actions */}
-        <div className="flex gap-2.5 w-full mt-auto pb-1">
-          <button className="btn-ghost flex-1" onClick={onCancel}>
-            <Pause size={14} /> Cancel
+        <div style={{ display: 'flex', gap: 12, width: '100%', marginTop: 'auto', paddingBottom: 8 }}>
+          <button className="btn-ghost" style={{ flex: 1 }} onClick={onCancel}>
+            Cancel
           </button>
-          <button
-            className="btn-primary"
-            style={{ flex: 2 }}
-            onClick={handleStop}
-          >
+          <button className="btn-primary" style={{ flex: 2 }} onClick={handleStop}>
             <Square size={14} />
             Stop &amp; generate
           </button>
         </div>
+
       </div>
 
-      <div className="relative z-10 flex items-center justify-center gap-2 py-3">
-        <span className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.12em', color: '#D1D5DB' }}>
+      <div style={{ textAlign: 'center', padding: '8px 0 16px' }}>
+        <span style={{ fontSize: 11, color: '#C7C7CC', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           End-to-end encrypted · Nothing stored
         </span>
       </div>

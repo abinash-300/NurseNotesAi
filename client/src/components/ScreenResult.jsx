@@ -3,7 +3,7 @@ import { ArrowLeft, MoreHorizontal, Copy, Check, Edit2, Flag, Share2, Plus, X } 
 
 const vibrate = (pattern) => { try { navigator.vibrate?.(pattern); } catch {} };
 
-const CLEAR_SECS = 300; // 5 minutes
+const CLEAR_SECS = 300;
 
 const SPECIALTY_LABELS = {
   general: 'General', icu: 'ICU', er: 'ER',
@@ -15,12 +15,12 @@ const LENGTH_LABELS = {
 };
 
 function timeAgo(ts) {
-  if (!ts) return 'JUST NOW';
+  if (!ts) return 'Just now';
   const secs = Math.floor((Date.now() - ts) / 1000);
-  if (secs < 10)   return 'JUST NOW';
-  if (secs < 60)   return `${secs}S AGO`;
-  if (secs < 3600) return `${Math.floor(secs / 60)} MIN AGO`;
-  return `${Math.floor(secs / 3600)}H AGO`;
+  if (secs < 10)   return 'Just now';
+  if (secs < 60)   return `${secs}s ago`;
+  if (secs < 3600) return `${Math.floor(secs / 60)}m ago`;
+  return `${Math.floor(secs / 3600)}h ago`;
 }
 
 function fmtCountdown(secs) {
@@ -56,39 +56,39 @@ function SoapCard({ section, body, index, onSave, flagged, onFlag }) {
   const save      = () => { onSave(draft); setEditing(false); };
   const cancel    = () => { setEditing(false); };
 
-  const borderColor = flagged ? '#F59E0B' : section.color;
+  const accentColor = flagged ? '#F59E0B' : section.color;
 
   return (
     <div
       className="animate-rise-in"
       style={{
         background: '#ffffff',
-        border: '1px solid #D1D5DB',
-        borderLeft: `4px solid ${borderColor}`,
-        borderRadius: 12,
+        border: 'none',
+        borderLeft: `3px solid ${accentColor}`,
+        borderRadius: 20,
         padding: '18px 20px',
         boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-        animationDelay: `${index * 90}ms`,
+        animationDelay: `${index * 80}ms`,
         transition: 'border-left-color 200ms ease',
       }}
     >
-      <div className="flex items-center justify-between mb-2.5">
-        <div className="flex items-center gap-3">
+      {/* Card header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span
-            className="font-mono flex-shrink-0"
             style={{
-              fontSize: 18, fontWeight: 600,
-              color: flagged ? '#F59E0B' : section.color,
+              fontSize: 18, fontWeight: 700, flexShrink: 0,
+              color: accentColor,
               transition: 'color 200ms ease',
             }}
           >
             {section.letter}
           </span>
-          <div className="flex flex-col" style={{ lineHeight: 1.2 }}>
-            <span style={{ fontSize: 15, fontWeight: 600, color: '#111827' }}>{section.title}</span>
-            <span className="font-mono" style={{ fontSize: 10, letterSpacing: '0.08em', color: '#6B7280' }}>
-              {words} WORDS{editing ? ' · EDITING' : ''}
-            </span>
+          <div style={{ lineHeight: 1.2 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#000000' }}>{section.title}</div>
+            <div style={{ fontSize: 11, color: '#8E8E93', marginTop: 1 }}>
+              {words} words{editing ? ' · Editing' : ''}
+            </div>
           </div>
         </div>
 
@@ -96,30 +96,30 @@ function SoapCard({ section, body, index, onSave, flagged, onFlag }) {
           <button
             onClick={cancel}
             aria-label="Cancel edit"
-            style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF' }}
+            style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#8E8E93' }}
           >
             <X size={14} />
           </button>
         ) : (
-          <div className="flex gap-0.5">
+          <div style={{ display: 'flex', gap: 0 }}>
             <button
               onClick={copy}
               aria-label="Copy"
-              style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: copied ? '#22C55E' : '#9CA3AF' }}
+              style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: copied ? '#34C759' : '#C7C7CC' }}
             >
               {copied ? <Check size={13} /> : <Copy size={13} />}
             </button>
             <button
               onClick={startEdit}
               aria-label="Edit"
-              style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF' }}
+              style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#C7C7CC' }}
             >
               <Edit2 size={13} />
             </button>
             <button
               onClick={onFlag}
               aria-label={flagged ? 'Remove flag' : 'Flag for review'}
-              style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: flagged ? '#F59E0B' : '#9CA3AF', transition: 'color 150ms ease' }}
+              style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: flagged ? '#F59E0B' : '#C7C7CC', transition: 'color 150ms ease' }}
             >
               <Flag size={13} fill={flagged ? '#F59E0B' : 'none'} />
             </button>
@@ -127,21 +127,22 @@ function SoapCard({ section, body, index, onSave, flagged, onFlag }) {
         )}
       </div>
 
+      {/* Needs review chip */}
       {flagged && (
-        <div className="mb-2.5">
+        <div style={{ marginBottom: 10 }}>
           <span
-            className="font-mono"
             style={{
-              fontSize: 10, letterSpacing: '0.06em',
+              fontSize: 10, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase',
               padding: '3px 8px', borderRadius: 99,
               background: '#FEF3C7', border: '1px solid #F59E0B', color: '#92400E',
             }}
           >
-            NEEDS REVIEW
+            Needs Review
           </span>
         </div>
       )}
 
+      {/* Body */}
       {editing ? (
         <>
           <textarea
@@ -150,28 +151,26 @@ function SoapCard({ section, body, index, onSave, flagged, onFlag }) {
             autoFocus
             style={{
               display: 'block', width: '100%', minHeight: 96,
-              background: '#F3F4F6',
-              border: `1px solid ${section.color}`,
-              borderRadius: 8, color: '#374151',
-              fontSize: 13.5, lineHeight: 1.6,
-              fontFamily: 'Sora, system-ui, sans-serif',
-              padding: '9px 11px', resize: 'vertical',
+              background: '#F2F2F7',
+              border: `1.5px solid ${section.color}`,
+              borderRadius: 12, color: '#000000',
+              fontSize: 15, lineHeight: 1.6,
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+              padding: '10px 12px', resize: 'vertical',
               outline: 'none', boxSizing: 'border-box',
             }}
           />
-          <div className="flex gap-2 mt-2.5">
-            <button className="btn-ghost" onClick={cancel}
-              style={{ flex: 1, padding: '7px 10px', fontSize: 12, borderRadius: 8 }}>
+          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+            <button className="btn-ghost" onClick={cancel} style={{ flex: 1, padding: '8px 10px', fontSize: 13, borderRadius: 10 }}>
               Cancel
             </button>
-            <button className="btn-primary" onClick={save}
-              style={{ flex: 2, padding: '7px 10px', fontSize: 12, borderRadius: 8 }}>
+            <button className="btn-primary" onClick={save} style={{ flex: 2, padding: '8px 10px', fontSize: 13, borderRadius: 10 }}>
               <Check size={13} /> Save
             </button>
           </div>
         </>
       ) : (
-        <p className="m-0" style={{ fontSize: 14.5, lineHeight: 1.6, color: '#374151' }}>{body}</p>
+        <p style={{ margin: 0, fontSize: 15, lineHeight: 1.65, color: '#000000', fontWeight: 400 }}>{body}</p>
       )}
     </div>
   );
@@ -185,19 +184,16 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
   const [flaggedKeys, setFlaggedKeys] = useState(new Set());
   const [copyConfirm, setCopyConfirm] = useState(false);
 
-  // Re-render every 15s so the "X mins ago" timestamp stays fresh
   useEffect(() => {
     const t = setInterval(() => forceUpdate((n) => n + 1), 15_000);
     return () => clearInterval(t);
   }, []);
 
-  // Countdown — cancels automatically if user navigates away (cleanup)
   useEffect(() => {
     const t = setInterval(() => setRemaining((r) => Math.max(0, r - 1)), 1000);
     return () => clearInterval(t);
   }, []);
 
-  // Fire when countdown reaches zero
   useEffect(() => {
     if (remaining === 0) {
       showToast?.('Session cleared for privacy');
@@ -205,7 +201,7 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
     }
   }, [remaining]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const timerColor = remaining > 120 ? '#34d399' : remaining > 30 ? '#fbbf24' : '#f87171';
+  const timerColor = remaining > 120 ? '#34C759' : remaining > 30 ? '#FF9F0A' : '#FF3B30';
 
   const updateSection = (key, text) => setEditedSoap((prev) => ({ ...prev, [key]: text }));
 
@@ -274,85 +270,89 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
 
   return (
     <div className="screen">
-      {/* Draining progress bar — absolute at the very top */}
-      <div
-        style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: 3, zIndex: 30,
-          background: '#F3F4F6',
-        }}
-      >
+
+      {/* Draining progress bar */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, zIndex: 30, background: '#F2F2F7' }}>
         <div
           style={{
             height: '100%',
             width: `${(remaining / CLEAR_SECS) * 100}%`,
             background: timerColor,
-            boxShadow: `0 0 6px ${timerColor}99`,
-            transition: 'width 1s linear, background-color 600ms ease, box-shadow 600ms ease',
+            transition: 'width 1s linear, background-color 600ms ease',
           }}
         />
       </div>
 
       {/* Header */}
       <div
-        className="relative z-10 flex items-center justify-between px-4 pt-3.5 pb-3"
-        style={{ borderBottom: '1px solid #D1D5DB', background: '#ffffff' }}
+        style={{
+          background: '#ffffff',
+          borderBottom: '0.5px solid #C6C6C8',
+          padding: '12px 16px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          position: 'relative', zIndex: 10,
+        }}
       >
-        <button className="btn-icon" onClick={onNew} aria-label="New session">
+        <button
+          className="btn-icon"
+          onClick={onNew}
+          aria-label="Back"
+          style={{ width: 34, height: 34 }}
+        >
           <ArrowLeft size={16} />
         </button>
-        <div className="flex flex-col items-center" style={{ lineHeight: 1.15 }}>
-          <span style={{ fontSize: 13.5, fontWeight: 600, color: '#111827' }}>
+
+        <div style={{ textAlign: 'center', lineHeight: 1.2 }}>
+          <div style={{ fontSize: 17, fontWeight: 700, color: '#000000' }}>
             Session #{sessionNumber}
-          </span>
-          <span className="font-mono" style={{ fontSize: 10, letterSpacing: '0.08em', color: '#9CA3AF' }}>
-            {timestamp} · {wordsIn} WORDS IN
-          </span>
+          </div>
+          <div style={{ fontSize: 12, color: '#8E8E93', marginTop: 2 }}>
+            {timestamp} · {wordsIn} words in
+          </div>
         </div>
-        <button className="btn-icon" aria-label="More"><MoreHorizontal size={16} /></button>
+
+        <button
+          className="btn-icon"
+          aria-label="More"
+          style={{ width: 34, height: 34 }}
+        >
+          <MoreHorizontal size={16} />
+        </button>
       </div>
 
-      {/* Auto-clear countdown chip */}
-      <div className="relative z-10 flex justify-center px-4 pb-1">
+      {/* Clear timer chip */}
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 16px 4px', position: 'relative', zIndex: 10 }}>
         <span
-          className="font-mono flex items-center gap-1.5"
           style={{
-            fontSize: 10, letterSpacing: '0.06em',
-            padding: '4px 10px', borderRadius: 99,
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            fontSize: 11, fontWeight: 500,
+            padding: '4px 11px', borderRadius: 99,
             color: timerColor,
             background: `${timerColor}14`,
-            border: `1px solid ${timerColor}38`,
-            transition: 'color 600ms ease, background 600ms ease, border-color 600ms ease',
+            transition: 'color 600ms ease, background 600ms ease',
           }}
         >
-          <span
-            style={{
-              width: 5, height: 5, borderRadius: '50%',
-              background: timerColor,
-              display: 'inline-block',
-              flexShrink: 0,
-              transition: 'background 600ms ease',
-            }}
-          />
+          <span style={{ width: 5, height: 5, borderRadius: '50%', background: timerColor, display: 'inline-block', flexShrink: 0 }} />
           Clears in {fmtCountdown(remaining)}
         </span>
       </div>
 
       {/* Context chips */}
-      <div className="relative z-10 flex gap-1.5 flex-wrap px-4 pt-2 pb-1">
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '4px 16px 6px', position: 'relative', zIndex: 10 }}>
         <span className="chip">{specialtyLabel}</span>
-        <span
-          className="chip"
-          style={{ background: '#faf5ff', border: '1px solid #d8b4fe', color: '#a855f7' }}
-        >
-          {lengthLabel}
-        </span>
+        <span className="chip">{lengthLabel}</span>
         <span className="chip chip-ok"><span className="dot" />Vitals captured</span>
       </div>
 
       {/* Scrollable SOAP cards */}
       <div
-        className="relative z-10 flex-1 overflow-y-auto scroll-thin flex flex-col gap-2.5 px-3.5 pt-2"
-        style={{ paddingBottom: 'calc(120px + env(safe-area-inset-bottom))' }}
+        className="scroll-thin"
+        style={{
+          flex: 1, overflowY: 'auto', position: 'relative', zIndex: 10,
+          display: 'flex', flexDirection: 'column', gap: 10,
+          padding: '4px 14px',
+          paddingBottom: 'calc(120px + env(safe-area-inset-bottom))',
+        }}
       >
         {SOAP_META.map((s, i) => (
           <SoapCard
@@ -368,21 +368,20 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
 
         {/* Meta panel */}
         <div
-          className="mt-1.5 rounded-[14px] grid grid-cols-2 gap-2.5 p-3.5"
-          style={{ background: '#F3F4F6', border: '1px solid #D1D5DB' }}
+          className="apple-card"
+          style={{ marginTop: 4, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, padding: '16px' }}
         >
           {[
-            { label: 'GENERATED IN',   value: `${secs}s`               },
-            { label: 'MODEL',          value: 'llama-3.1-8b'            },
-            { label: 'CONFIDENCE',     value: 'HIGH · 94%', green: true },
-            { label: 'WORDS IN / OUT', value: `${wordsIn} / ${wordsOut}` },
+            { label: 'Generated in', value: `${secs}s`                },
+            { label: 'Model',        value: 'llama-3.1-8b'             },
+            { label: 'Confidence',   value: 'High · 94%',  green: true },
+            { label: 'Words',        value: `${wordsIn} in / ${wordsOut} out` },
           ].map(({ label, value, green }) => (
-            <div key={label} className="flex flex-col gap-0.5">
-              <span className="eyebrow" style={{ fontSize: 9 }}>{label}</span>
-              <span className="font-mono tabular-nums"
-                style={{ fontSize: 13, color: green ? '#22C55E' : '#111827' }}>
+            <div key={label}>
+              <div style={{ fontSize: 11, color: '#8E8E93', marginBottom: 2, fontWeight: 500 }}>{label}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: green ? '#34C759' : '#000000', fontVariantNumeric: 'tabular-nums' }}>
                 {value}
-              </span>
+              </div>
             </div>
           ))}
         </div>
@@ -391,39 +390,29 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
       {/* Flag-copy confirmation overlay */}
       {copyConfirm && (
         <div
-          className="absolute left-0 right-0 z-30 mx-3"
           style={{
-            bottom: 'calc(92px + env(safe-area-inset-bottom))',
+            position: 'absolute', left: 12, right: 12, zIndex: 30,
+            bottom: 'calc(96px + env(safe-area-inset-bottom))',
             background: '#FFFBEB',
             border: '1px solid #F59E0B',
-            borderRadius: 14,
-            padding: '14px 16px',
+            borderRadius: 20,
+            padding: '16px 18px',
             boxShadow: '0 4px 20px rgba(245,158,11,0.18)',
           }}
         >
-          <p style={{ margin: '0 0 12px', fontSize: 13.5, color: '#92400E', lineHeight: 1.5 }}>
+          <p style={{ margin: '0 0 12px', fontSize: 14, color: '#92400E', lineHeight: 1.5 }}>
             {flaggedKeys.size === 1 ? '1 section' : `${flaggedKeys.size} sections`} flagged for review. Copy anyway?
           </p>
-          <div className="flex gap-2">
+          <div style={{ display: 'flex', gap: 10 }}>
             <button
               onClick={() => setCopyConfirm(false)}
-              style={{
-                flex: 1, padding: '9px 12px', borderRadius: 9,
-                fontSize: 13, fontWeight: 500,
-                background: 'transparent', border: '1px solid #F59E0B',
-                color: '#92400E', cursor: 'pointer',
-              }}
+              style={{ flex: 1, padding: '10px 12px', borderRadius: 12, fontSize: 14, fontWeight: 500, background: 'transparent', border: '1px solid #F59E0B', color: '#92400E', cursor: 'pointer' }}
             >
               Review first
             </button>
             <button
               onClick={copyAnyway}
-              style={{
-                flex: 1, padding: '9px 12px', borderRadius: 9,
-                fontSize: 13, fontWeight: 600,
-                background: '#F59E0B', border: 'none',
-                color: '#ffffff', cursor: 'pointer',
-              }}
+              style={{ flex: 1, padding: '10px 12px', borderRadius: 12, fontSize: 14, fontWeight: 600, background: '#F59E0B', border: 'none', color: '#ffffff', cursor: 'pointer' }}
             >
               Copy anyway
             </button>
@@ -433,30 +422,38 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
 
       {/* Sticky bottom bar */}
       <div
-        className="absolute left-0 right-0 bottom-0 z-20 flex items-center gap-2 px-4 pt-3.5"
         style={{
-          paddingBottom: 'calc(20px + env(safe-area-inset-bottom))',
+          position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 20,
+          display: 'flex', alignItems: 'center', gap: 10,
+          padding: '12px 16px',
+          paddingBottom: 'calc(12px + env(safe-area-inset-bottom))',
           background: '#ffffff',
-          borderTop: '1px solid #D1D5DB',
+          borderTop: '0.5px solid #C6C6C8',
         }}
       >
-        <button className="btn-icon" onClick={handleShare} aria-label="Share note"
-          style={{ width: 48, height: 48, borderRadius: 14 }}>
+        <button
+          className="btn-icon"
+          onClick={handleShare}
+          aria-label="Share"
+          style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0 }}
+        >
           <Share2 size={18} />
         </button>
-        <button className="btn-primary flex-1" onClick={copyFull}
-          style={{ padding: '14px 18px', borderRadius: 14 }}>
+
+        <button
+          className="btn-primary"
+          onClick={copyFull}
+          style={{ flex: 1, padding: '14px 18px', borderRadius: 14, fontSize: 16 }}
+        >
           {fullCopied ? <Check size={16} /> : <Copy size={16} />}
           {fullCopied ? 'Copied!' : 'Copy full note'}
         </button>
+
         <button
           className="btn-icon"
           onClick={onNew}
           aria-label="New session"
-          style={{
-            width: 48, height: 48, borderRadius: 14,
-            background: '#F3F4F6', border: '1px solid #D1D5DB', color: '#111827',
-          }}
+          style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0 }}
         >
           <Plus size={18} />
         </button>
