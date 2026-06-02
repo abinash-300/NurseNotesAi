@@ -133,7 +133,7 @@ export default function ScreenProcessing({ transcript, specialty = 'general', no
     <div className="screen">
       <BrandRow state="processing" />
 
-      <div className="relative z-10 flex-1 flex flex-col px-5 pt-5 gap-[22px]">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-5 gap-[22px]">
         {/* Spinning brain */}
         <div className="text-center flex flex-col items-center gap-2 mt-3">
           <div

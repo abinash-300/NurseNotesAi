@@ -36,22 +36,6 @@ const SOAP_META = [
   { key: 'plan',       letter: 'P', title: 'Plan',       color: '#22C55E' },
 ];
 
-function SoapRing({ letter, color }) {
-  return (
-    <div
-      className="font-mono flex items-center justify-center flex-shrink-0"
-      style={{
-        width: 40, height: 40, borderRadius: '50%',
-        fontSize: 18, fontWeight: 600, color,
-        background: `${color}12`,
-        border: `2px solid ${color}`,
-      }}
-    >
-      {letter}
-    </div>
-  );
-}
-
 function SoapCard({ section, body, index, onSave }) {
   const [copied,  setCopied]  = useState(false);
   const [editing, setEditing] = useState(false);
@@ -80,14 +64,19 @@ function SoapCard({ section, body, index, onSave }) {
         border: '1px solid #D1D5DB',
         borderLeft: `4px solid ${section.color}`,
         borderRadius: 12,
-        padding: '14px 16px',
+        padding: '18px 20px',
         boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
         animationDelay: `${index * 90}ms`,
       }}
     >
       <div className="flex items-center justify-between mb-2.5">
         <div className="flex items-center gap-3">
-          <SoapRing letter={section.letter} color={section.color} />
+          <span
+            className="font-mono flex-shrink-0"
+            style={{ fontSize: 18, fontWeight: 600, color: section.color }}
+          >
+            {section.letter}
+          </span>
           <div className="flex flex-col" style={{ lineHeight: 1.2 }}>
             <span style={{ fontSize: 15, fontWeight: 600, color: '#111827' }}>{section.title}</span>
             <span className="font-mono" style={{ fontSize: 10, letterSpacing: '0.08em', color: '#6B7280' }}>
@@ -97,16 +86,35 @@ function SoapCard({ section, body, index, onSave }) {
         </div>
 
         {editing ? (
-          <button className="btn-icon" onClick={cancel} aria-label="Cancel edit"><X size={14} /></button>
+          <button
+            onClick={cancel}
+            aria-label="Cancel edit"
+            style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF' }}
+          >
+            <X size={14} />
+          </button>
         ) : (
-          <div className="flex gap-1">
-            <button className="btn-icon" onClick={copy} aria-label="Copy">
-              {copied ? <Check size={14} style={{ color: '#22C55E' }} /> : <Copy size={14} />}
+          <div className="flex gap-0.5">
+            <button
+              onClick={copy}
+              aria-label="Copy"
+              style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: copied ? '#22C55E' : '#9CA3AF' }}
+            >
+              {copied ? <Check size={13} /> : <Copy size={13} />}
             </button>
-            <button className="btn-icon" onClick={startEdit} aria-label="Edit">
-              <Edit2 size={14} />
+            <button
+              onClick={startEdit}
+              aria-label="Edit"
+              style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF' }}
+            >
+              <Edit2 size={13} />
             </button>
-            <button className="btn-icon" aria-label="Flag"><Flag size={14} /></button>
+            <button
+              aria-label="Flag"
+              style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF' }}
+            >
+              <Flag size={13} />
+            </button>
           </div>
         )}
       </div>
@@ -140,7 +148,7 @@ function SoapCard({ section, body, index, onSave }) {
           </div>
         </>
       ) : (
-        <p className="m-0" style={{ fontSize: 13.5, lineHeight: 1.6, color: '#374151' }}>{body}</p>
+        <p className="m-0" style={{ fontSize: 14.5, lineHeight: 1.6, color: '#374151' }}>{body}</p>
       )}
     </div>
   );

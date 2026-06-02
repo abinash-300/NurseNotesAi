@@ -105,13 +105,13 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
         </div>
 
         <MicCore recording onTap={handleStop} size={110} />
-        <Waveform active={!recError} count={42} color="#06B6D4" height={48} />
+        <Waveform active={!recError} count={42} color="#6B7280" height={48} />
 
         {/* Live transcript card */}
         <div
           className="w-full relative"
           style={{
-            padding: '14px 16px', maxHeight: 200, overflow: 'hidden',
+            padding: '18px 20px', minHeight: 200, overflow: 'hidden',
             background: '#F3F4F6', border: '1px solid #D1D5DB', borderRadius: 16,
           }}
         >
@@ -135,7 +135,7 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
               {recError}
             </p>
           ) : lines.length === 0 ? (
-            <p className="m-0 italic" style={{ fontSize: 13, lineHeight: 1.55, color: '#9CA3AF' }}>
+            <p className="m-0 italic" style={{ fontSize: 14, lineHeight: 1.55, color: '#9CA3AF' }}>
               Listening… start speaking the patient report.
               <span style={{ color: '#06B6D4' }}> ▍</span>
             </p>
@@ -146,7 +146,7 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
                   key={i}
                   className="m-0"
                   style={{
-                    fontSize: 13,
+                    fontSize: 14,
                     color: '#374151',
                     lineHeight: 1.45,
                   }}
@@ -174,7 +174,6 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
             className="btn-primary"
             style={{ flex: 2 }}
             onClick={handleStop}
-            disabled={wordCount === 0 && !recError}
           >
             <Square size={14} />
             Stop &amp; generate
