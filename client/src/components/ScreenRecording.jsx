@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Square } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import BrandRow from './BrandRow.jsx';
 import MicCore from './MicCore.jsx';
 import Waveform from './Waveform.jsx';
@@ -84,98 +84,143 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
     <div className="screen">
       <BrandRow state="recording" />
 
-      <div className="flex-1 flex flex-col items-center px-4 pt-5 gap-4 overflow-y-auto scroll-thin">
+      <div className="flex-1 overflow-y-auto scroll-thin">
+        <div className="flex flex-col items-center px-4 pt-6 pb-6 gap-5">
 
-        {/* Timer */}
-        <div style={{ textAlign: 'center', paddingTop: 4 }}>
-          <div
-            style={{
-              fontSize: 64,
-              fontWeight: 800,
-              color: '#000000',
-              letterSpacing: '-0.03em',
-              lineHeight: 1,
-              fontVariantNumeric: 'tabular-nums',
-              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
-            }}
-          >
-            {fmtTime(seconds)}
-          </div>
-          <div style={{ marginTop: 8 }}>
-            <span
-              style={{
-                fontSize: 11, fontWeight: 600, letterSpacing: '0.10em', textTransform: 'uppercase',
-                color: recError ? '#FF3B30' : '#8E8E93',
-              }}
-            >
-              {recError ? 'Voice unavailable' : 'Recording — tap orb to stop'}
-            </span>
-          </div>
-        </div>
-
-        {/* Orb */}
-        <MicCore recording onTap={handleStop} size={110} />
-
-        {/* Waveform */}
-        <Waveform active={!recError} count={44} color="#C6C6C8" height={44} />
-
-        {/* Live transcript card */}
-        <div className="apple-card w-full" style={{ padding: '16px 18px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#8E8E93', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              Live Transcript
-            </span>
-            <span style={{ fontSize: 12, color: '#8E8E93' }}>
-              {wordCount} word{wordCount !== 1 ? 's' : ''}
-            </span>
-          </div>
-
-          <div style={{ minHeight: 180, position: 'relative', overflow: 'hidden' }}>
-            {recError ? (
-              <p style={{ margin: 0, fontSize: 14, color: '#FF3B30', lineHeight: 1.55 }}>{recError}</p>
-            ) : lines.length === 0 ? (
-              <p style={{ margin: 0, fontSize: 14, color: '#8E8E93', lineHeight: 1.55, fontStyle: 'italic' }}>
-                Listening… start speaking the patient report.
-                <span style={{ color: '#06B6D4' }}> ▍</span>
-              </p>
-            ) : (
-              <div>
-                {lines.map((line, i) => (
-                  <p key={i} style={{ margin: '0 0 5px', fontSize: 15, color: '#000000', lineHeight: 1.5 }}>
-                    {line}
-                    {i === lines.length - 1 && <span style={{ color: '#06B6D4' }}> ▍</span>}
-                  </p>
-                ))}
-              </div>
-            )}
+          {/* Timer */}
+          <div style={{ textAlign: 'center' }}>
             <div
               style={{
-                position: 'absolute', left: 0, right: 0, bottom: 0, height: 28,
-                background: 'linear-gradient(transparent, #ffffff)',
-                pointerEvents: 'none',
-                borderRadius: '0 0 20px 20px',
+                fontSize: 64,
+                fontWeight: 800,
+                color: '#000000',
+                letterSpacing: '-0.03em',
+                lineHeight: 1,
+                fontVariantNumeric: 'tabular-nums',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
               }}
-            />
+            >
+              {fmtTime(seconds)}
+            </div>
+
+            {/* Status label: pulsing red dot + grey text */}
+            <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+              {!recError && (
+                <span
+                  className="animate-pulse-dot"
+                  style={{ width: 8, height: 8, borderRadius: '50%', background: '#EF4444', display: 'inline-block', flexShrink: 0 }}
+                />
+              )}
+              <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', color: recError ? '#FF3B30' : '#8E8E93' }}>
+                {recError ? 'Voice unavailable' : 'Recording'}
+              </span>
+            </div>
           </div>
+
+          {/* Orb */}
+          <MicCore recording onTap={handleStop} size={110} />
+
+          {/* Waveform */}
+          <Waveform active={!recError} count={44} color="#C6C6C8" height={40} />
+
+          {/* Live transcript card — section header above */}
+          <div style={{ width: '100%' }}>
+            <div style={{ paddingLeft: 4, marginBottom: 8 }}>
+              <span style={{ fontSize: 11, fontWeight: 600, color: '#8E8E93', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+                Live Transcript
+              </span>
+            </div>
+
+            <div className="apple-card w-full" style={{ padding: '16px 18px' }}>
+              {/* Word count chip inside card top-right */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
+                <span
+                  style={{
+                    fontSize: 11, fontWeight: 500,
+                    padding: '3px 9px', borderRadius: 99,
+                    background: 'rgba(120,120,128,0.10)',
+                    color: '#8E8E93',
+                  }}
+                >
+                  {wordCount} word{wordCount !== 1 ? 's' : ''}
+                </span>
+              </div>
+
+              <div style={{ minHeight: 160, position: 'relative', overflow: 'hidden' }}>
+                {recError ? (
+                  <p style={{ margin: 0, fontSize: 14, color: '#FF3B30', lineHeight: 1.55 }}>{recError}</p>
+                ) : lines.length === 0 ? (
+                  <p style={{ margin: 0, fontSize: 15, color: '#8E8E93', lineHeight: 1.55, fontStyle: 'italic' }}>
+                    Listening… start speaking the patient report.
+                    <span style={{ color: '#06B6D4' }}> ▍</span>
+                  </p>
+                ) : (
+                  <div>
+                    {lines.map((line, i) => (
+                      <p key={i} style={{ margin: '0 0 5px', fontSize: 15, color: '#000000', lineHeight: 1.5 }}>
+                        {line}
+                        {i === lines.length - 1 && <span style={{ color: '#06B6D4' }}> ▍</span>}
+                      </p>
+                    ))}
+                  </div>
+                )}
+                <div
+                  style={{
+                    position: 'absolute', left: 0, right: 0, bottom: 0, height: 28,
+                    background: 'linear-gradient(transparent, #ffffff)',
+                    pointerEvents: 'none',
+                    borderRadius: '0 0 20px 20px',
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Cancel: white pill card */}
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
+            <button
+              onClick={onCancel}
+              style={{
+                width: '100%',
+                padding: '15px 24px',
+                borderRadius: 14,
+                fontSize: 15,
+                fontWeight: 500,
+                background: '#ffffff',
+                border: 'none',
+                color: '#000000',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)',
+                cursor: 'pointer',
+                transition: 'opacity 120ms ease, transform 120ms ease',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+              onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.98)'; e.currentTarget.style.opacity = '0.80'; }}
+              onMouseUp={(e)   => { e.currentTarget.style.transform = ''; e.currentTarget.style.opacity = ''; }}
+              onTouchStart={(e) => { e.currentTarget.style.transform = 'scale(0.98)'; e.currentTarget.style.opacity = '0.80'; }}
+              onTouchEnd={(e)   => { e.currentTarget.style.transform = ''; e.currentTarget.style.opacity = ''; }}
+            >
+              Cancel
+            </button>
+
+            {/* Stop: full-width cyan 52px */}
+            <button
+              className="btn-primary"
+              onClick={handleStop}
+              style={{ width: '100%', height: 52, borderRadius: 14, fontSize: 16 }}
+            >
+              Stop &amp; generate
+            </button>
+          </div>
+
+          {/* Privacy footer */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+            <Lock size={10} style={{ color: '#C7C7CC' }} />
+            <span style={{ fontSize: 11, color: '#C7C7CC', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              End-to-end encrypted · Nothing stored
+            </span>
+          </div>
+
         </div>
-
-        {/* Actions */}
-        <div style={{ display: 'flex', gap: 12, width: '100%', marginTop: 'auto', paddingBottom: 8 }}>
-          <button className="btn-ghost" style={{ flex: 1 }} onClick={onCancel}>
-            Cancel
-          </button>
-          <button className="btn-primary" style={{ flex: 2 }} onClick={handleStop}>
-            <Square size={14} />
-            Stop &amp; generate
-          </button>
-        </div>
-
-      </div>
-
-      <div style={{ textAlign: 'center', padding: '8px 0 16px' }}>
-        <span style={{ fontSize: 11, color: '#C7C7CC', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-          End-to-end encrypted · Nothing stored
-        </span>
       </div>
     </div>
   );

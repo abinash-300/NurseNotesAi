@@ -132,25 +132,27 @@ export default function ScreenProcessing({ transcript, specialty = 'general', no
 
       <div className="flex-1 flex flex-col items-center justify-center px-4 gap-4">
 
-        {/* Brain + title */}
-        <div className="apple-card w-full flex flex-col items-center gap-4 py-8 px-6">
-          <div
-            style={{
-              width: 64, height: 64, borderRadius: 20,
-              background: 'rgba(6,182,212,0.10)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#06B6D4',
-            }}
-          >
-            <span className="animate-spin inline-flex"><Brain size={28} /></span>
+        {/* Brain in 80px white circle + slow-spin */}
+        <div
+          style={{
+            width: 80, height: 80, borderRadius: '50%',
+            background: '#ffffff',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+        >
+          <span className="animate-slow-spin inline-flex" style={{ color: '#06B6D4' }}>
+            <Brain size={32} strokeWidth={1.6} />
+          </span>
+        </div>
+
+        {/* Title + context */}
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: '#000000', letterSpacing: '-0.015em' }}>
+            Synthesizing note
           </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 24, fontWeight: 700, color: '#000000', letterSpacing: '-0.015em' }}>
-              Synthesizing note
-            </div>
-            <div style={{ fontSize: 13, color: '#8E8E93', marginTop: 4 }}>
-              {wordCount} words · {specialtyLabel} · {lengthLabel}
-            </div>
+          <div style={{ fontSize: 13, color: '#8E8E93', marginTop: 6 }}>
+            {wordCount} words · {specialtyLabel} · {lengthLabel}
           </div>
         </div>
 
@@ -164,22 +166,24 @@ export default function ScreenProcessing({ transcript, specialty = 'general', no
                 <div
                   style={{
                     display: 'flex', alignItems: 'center', gap: 12,
-                    padding: '14px 16px',
+                    padding: '0 16px',
+                    height: 56,
                     opacity: i > step ? 0.30 : 1,
                     transition: 'opacity 300ms',
                   }}
                 >
+                  {/* 36px circle */}
                   <div
                     style={{
-                      width: 30, height: 30, borderRadius: '50%',
+                      width: 36, height: 36, borderRadius: '50%',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 13, fontWeight: 600,
+                      fontSize: 14, fontWeight: 600,
                       background: done ? 'rgba(52,199,89,0.12)' : active ? `${s.color}18` : 'rgba(120,120,128,0.10)',
                       color: done ? '#34C759' : active ? s.color : '#8E8E93',
                       position: 'relative', flexShrink: 0,
                     }}
                   >
-                    {done ? <Check size={14} /> : s.letter}
+                    {done ? <Check size={15} /> : s.letter}
                     {active && (
                       <span
                         className="absolute animate-pulse-dot"
@@ -201,22 +205,34 @@ export default function ScreenProcessing({ transcript, specialty = 'general', no
                     </span>
                   )}
                 </div>
-                {i < SOAP_META.length - 1 && <div className="list-sep" />}
+                {/* Ultra-subtle #F2F2F7 divider */}
+                {i < SOAP_META.length - 1 && (
+                  <div style={{ height: 1, background: '#F2F2F7', marginLeft: 16 }} />
+                )}
               </div>
             );
           })}
         </div>
 
-        {/* Elapsed */}
+        {/* Elapsed + Groq chip */}
         <div className="apple-card w-full" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <Activity size={14} style={{ color: '#06B6D4' }} />
-            <span style={{ fontSize: 14, color: '#000000' }}>
+            <span style={{ fontSize: 14, color: '#000000', fontVariantNumeric: 'tabular-nums' }}>
               {(tick / 1000).toFixed(1)}s elapsed
             </span>
           </div>
-          <span style={{ fontSize: 11, color: '#8E8E93' }}>
-            {specialtyLabel} · Groq
+          {/* Groq chip: #EFF9FF bg, #BAE6FD border, #06B6D4 text */}
+          <span
+            style={{
+              fontSize: 11, fontWeight: 600, letterSpacing: '0.03em',
+              padding: '4px 10px', borderRadius: 99,
+              background: '#EFF9FF',
+              border: '1px solid #BAE6FD',
+              color: '#06B6D4',
+            }}
+          >
+            Groq · {specialtyLabel}
           </span>
         </div>
 

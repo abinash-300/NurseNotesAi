@@ -22,7 +22,7 @@ export default function Waveform({ active, count = 48, color = '#f87171', height
             width: 3,
             height,
             background: `linear-gradient(180deg, ${color}, ${color}88)`,
-            borderRadius: 3,
+            borderRadius: 999,
             transformOrigin: 'center',
             transform: active ? undefined : 'scaleY(0.08)',
             animation: active
