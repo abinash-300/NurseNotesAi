@@ -5,7 +5,8 @@ import ScreenIdle      from './components/ScreenIdle.jsx';
 import ScreenRecording from './components/ScreenRecording.jsx';
 import ScreenProcessing from './components/ScreenProcessing.jsx';
 import ScreenResult    from './components/ScreenResult.jsx';
-import InstallPrompt   from './components/InstallPrompt.jsx';
+import InstallPrompt      from './components/InstallPrompt.jsx';
+import IOSInstallBanner  from './components/iOSInstallBanner.jsx';
 
 const vibrate = (pattern) => { try { navigator.vibrate?.(pattern); } catch {} };
 
@@ -120,7 +121,10 @@ export default function App() {
       )}
 
       {screen === 'idle' && (
-        <ScreenIdle onStart={startRecording} onDemo={loadDemo} sessions={sessions} onOpenSession={openSession} specialty={specialty} onSpecialtyChange={setSpecialty} noteLength={noteLength} onNoteLengthChange={setNoteLength} />
+        <>
+          <ScreenIdle onStart={startRecording} onDemo={loadDemo} sessions={sessions} onOpenSession={openSession} specialty={specialty} onSpecialtyChange={setSpecialty} noteLength={noteLength} onNoteLengthChange={setNoteLength} />
+          <IOSInstallBanner />
+        </>
       )}
       {screen === 'recording' && (
         <ScreenRecording
