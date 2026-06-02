@@ -35,10 +35,15 @@ export default {
           '0%':   { opacity: '0', transform: 'translateY(10px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        'mic-breathe': {
+          '0%, 100%': { transform: 'scale(1)',    opacity: '1'   },
+          '50%':       { transform: 'scale(1.08)', opacity: '0.55' },
+        },
       },
       animation: {
-        'pulse-dot': 'pulse-dot 1.4s ease-in-out infinite',
-        'rise-in':   'rise-in 400ms cubic-bezier(0.16,1,0.3,1) both',
+        'pulse-dot':   'pulse-dot 1.4s ease-in-out infinite',
+        'rise-in':     'rise-in 400ms cubic-bezier(0.16,1,0.3,1) both',
+        'mic-breathe': 'mic-breathe 2.5s ease-in-out infinite',
       },
     },
   },

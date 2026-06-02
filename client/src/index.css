@@ -53,7 +53,7 @@
   .apple-card {
     background: #FFFFFF;
     border-radius: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
   }
 
   /* ── Section header (above cards) ─────────────────────── */
@@ -159,6 +159,10 @@
   }
   .eyebrow-red  { color: #FF3B30; }
   .eyebrow-cyan { color: #06B6D4; }
+
+  /* ── Hide scrollbar (horizontal chip rows) ────────────── */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
   /* ── Scrollbar ─────────────────────────────────────────── */
   .scroll-thin::-webkit-scrollbar { width: 4px; }

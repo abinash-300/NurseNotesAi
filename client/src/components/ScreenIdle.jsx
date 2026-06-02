@@ -23,7 +23,7 @@ const NOTE_LENGTH_OPTIONS = [
 function SectionHeader({ children }) {
   return (
     <div style={{ paddingLeft: 4, marginBottom: 8 }}>
-      <span style={{ fontSize: 12, fontWeight: 700, color: '#000000', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <span style={{ fontSize: 11, fontWeight: 600, color: '#8E8E93', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
         {children}
       </span>
     </div>
@@ -93,31 +93,47 @@ export default function ScreenIdle({
           {/* ── Specialty ──────────────────────────────────── */}
           <div>
             <SectionHeader>Specialty</SectionHeader>
-            <div className="apple-card px-4 py-4">
-              <div className="flex flex-wrap gap-2">
-                {SPECIALTIES.map((s) => {
-                  const active = specialty === s.key;
-                  return (
-                    <button
-                      key={s.key}
-                      onClick={() => onSpecialtyChange(s.key)}
-                      style={{
-                        padding: '7px 16px',
-                        borderRadius: 99,
-                        fontSize: 13,
-                        fontWeight: active ? 600 : 400,
-                        border: 'none',
-                        background: active ? 'rgba(6,182,212,0.12)' : 'rgba(120,120,128,0.10)',
-                        color: active ? '#06B6D4' : '#000000',
-                        cursor: 'pointer',
-                        transition: 'all 140ms ease',
-                        WebkitTapHighlightColor: 'transparent',
-                      }}
-                    >
-                      {s.label}
-                    </button>
-                  );
-                })}
+            <div className="apple-card" style={{ padding: '14px 16px' }}>
+              {/* Horizontally scrollable chips with right fade */}
+              <div style={{ position: 'relative' }}>
+                <div
+                  className="no-scrollbar"
+                  style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingRight: 20 }}
+                >
+                  {SPECIALTIES.map((s) => {
+                    const active = specialty === s.key;
+                    return (
+                      <button
+                        key={s.key}
+                        onClick={() => onSpecialtyChange(s.key)}
+                        style={{
+                          height: 34,
+                          padding: '0 16px',
+                          borderRadius: 99,
+                          fontSize: 13,
+                          fontWeight: active ? 600 : 400,
+                          border: 'none',
+                          flexShrink: 0,
+                          background: active ? 'rgba(6,182,212,0.12)' : 'rgba(120,120,128,0.10)',
+                          color: active ? '#06B6D4' : '#000000',
+                          cursor: 'pointer',
+                          transition: 'all 140ms ease',
+                          WebkitTapHighlightColor: 'transparent',
+                        }}
+                      >
+                        {s.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                {/* Right-edge fade hint */}
+                <div
+                  style={{
+                    position: 'absolute', top: 0, right: 0, bottom: 0, width: 36,
+                    background: 'linear-gradient(to right, transparent, #ffffff)',
+                    pointerEvents: 'none',
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -125,7 +141,7 @@ export default function ScreenIdle({
           {/* ── Note Length ────────────────────────────────── */}
           <div>
             <SectionHeader>Note Length</SectionHeader>
-            <div className="apple-card" style={{ padding: 6 }}>
+            <div className="apple-card" style={{ padding: '14px 16px' }}>
               <div
                 style={{
                   display: 'flex',
@@ -160,30 +176,6 @@ export default function ScreenIdle({
                   );
                 })}
               </div>
-            </div>
-          </div>
-
-          {/* ── Load demo (list row) ────────────────────────── */}
-          <div>
-            <SectionHeader>Demo</SectionHeader>
-            <div className="apple-card overflow-hidden">
-              <button
-                onClick={onDemo}
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  width: '100%', padding: '14px 16px',
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  WebkitTapHighlightColor: 'transparent',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(6,182,212,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#06B6D4', flexShrink: 0 }}>
-                    <Zap size={15} />
-                  </div>
-                  <span style={{ fontSize: 16, color: '#000000' }}>Load demo patient</span>
-                </div>
-                <ChevronRight size={16} style={{ color: '#C7C7CC' }} />
-              </button>
             </div>
           </div>
 
@@ -229,6 +221,21 @@ export default function ScreenIdle({
               )}
             </div>
           </div>
+
+          {/* ── Demo text link ─────────────────────────────── */}
+          {speechSupported && (
+            <button
+              onClick={onDemo}
+              style={{
+                alignSelf: 'center',
+                background: 'none', border: 'none', cursor: 'pointer',
+                fontSize: 14, color: '#8E8E93', padding: '2px 0',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              Try with a demo patient →
+            </button>
+          )}
 
           {/* ── Privacy footer ─────────────────────────────── */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
