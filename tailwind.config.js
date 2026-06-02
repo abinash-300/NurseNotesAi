@@ -29,12 +29,12 @@ export default {
           '50%':       { opacity: '0.4', transform: 'scale(0.8)' },
         },
         'mic-glow': {
-          '0%, 100%': { boxShadow: '0 0 40px rgba(6,182,212,0.20), 0 0 80px rgba(6,182,212,0.08)' },
-          '50%':       { boxShadow: '0 0 55px rgba(6,182,212,0.35), 0 0 100px rgba(6,182,212,0.14)' },
+          '0%, 100%': { boxShadow: '0 0 20px rgba(6,182,212,0.10), 0 0 40px rgba(6,182,212,0.04)' },
+          '50%':       { boxShadow: '0 0 28px rgba(6,182,212,0.18), 0 0 50px rgba(6,182,212,0.07)' },
         },
         'mic-glow-red': {
-          '0%, 100%': { boxShadow: '0 0 40px rgba(239,68,68,0.25), 0 0 80px rgba(239,68,68,0.10)' },
-          '50%':       { boxShadow: '0 0 55px rgba(239,68,68,0.40), 0 0 100px rgba(239,68,68,0.16)' },
+          '0%, 100%': { boxShadow: '0 0 20px rgba(239,68,68,0.12), 0 0 40px rgba(239,68,68,0.05)' },
+          '50%':       { boxShadow: '0 0 28px rgba(239,68,68,0.22), 0 0 50px rgba(239,68,68,0.08)' },
         },
         'rise-in': {
           '0%':   { opacity: '0', transform: 'translateY(12px)' },

@@ -16,17 +16,14 @@ const SPECIALTIES = [
 
 function SpecialtyRow({ specialty, onChange }) {
   return (
-    <div
-      className="flex gap-2 w-full"
-      style={{ overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch', paddingBottom: 2 }}
-    >
+    <div className="flex flex-wrap gap-2 w-full justify-center">
       {SPECIALTIES.map((s) => {
         const active = specialty === s.key;
         return (
           <button
             key={s.key}
             onClick={() => onChange(s.key)}
-            className="flex-shrink-0 font-mono"
+            className="font-mono"
             style={{
               padding: '6px 14px',
               borderRadius: 99,
@@ -121,10 +118,7 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
 
       {speechSupported ? (
         /* ── Normal hero ── */
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center gap-5 px-6 pt-2">
-          <span className="eyebrow" style={{ fontSize: 9.5 }}>
-            READY · SESSION {1000 + sessions.length + 1}
-          </span>
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center gap-6 px-6 pt-2">
 
           {/* Ambient glow behind mic orb */}
           <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -134,18 +128,18 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
                 width: 220,
                 height: 220,
                 borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(6,182,212,0.08) 0%, rgba(6,182,212,0.02) 55%, transparent 70%)',
+                background: 'radial-gradient(circle, rgba(6,182,212,0.04) 0%, rgba(6,182,212,0.01) 55%, transparent 70%)',
                 pointerEvents: 'none',
               }}
             />
             <MicCore onTap={onStart} size={140} />
           </div>
 
-          <div className="text-center flex flex-col gap-1.5">
+          <div className="text-center flex flex-col gap-2">
             <span style={{ fontSize: '1.6rem', fontWeight: 700, color: '#111827', letterSpacing: '-0.02em', lineHeight: 1.15 }}>
               Press to begin
             </span>
-            <span style={{ fontSize: 13.5, color: '#6B7280', lineHeight: 1.45 }}>
+            <span style={{ fontSize: 14.5, color: '#6B7280', lineHeight: 1.5 }}>
               Speak the patient report.<br />SOAP note generated in seconds.
             </span>
           </div>
@@ -209,10 +203,10 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
       <div className="relative z-10 px-4 pb-3">
         <div
           style={{
-            background: '#F3F4F6',
-            border: '1px solid #D1D5DB',
+            background: '#ffffff',
+            border: '1px solid #E5E7EB',
             borderRadius: 16,
-            padding: '14px 16px',
+            padding: '18px 20px',
           }}
         >
           <div className="flex items-center justify-between mb-2.5">
@@ -272,8 +266,8 @@ export default function ScreenIdle({ onStart, onDemo, sessions = [], onOpenSessi
                   >
                     <Activity size={14} />
                   </div>
-                  <div className="flex flex-col" style={{ lineHeight: 1.2 }}>
-                    <span style={{ fontSize: 13, color: '#111827' }}>
+                  <div className="flex flex-col" style={{ lineHeight: 1.2, minWidth: 0 }}>
+                    <span style={{ fontSize: 14, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {subjectivePreview(session.soap.subjective)}
                     </span>
                     <span className="font-mono" style={{ fontSize: 10, letterSpacing: '0.06em', color: '#9CA3AF' }}>
