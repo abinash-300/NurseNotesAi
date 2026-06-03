@@ -279,14 +279,17 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
           <div style={{ fontSize: 17, fontWeight: 700, color: '#000000' }}>
             Session #{sessionNumber}
           </div>
-          {/* Single metadata line */}
-          <div style={{ fontSize: 13, color: '#8E8E93', marginTop: 3 }}>
-            {wordsIn} words · {specialtyLabel} · Vitals captured
-          </div>
         </div>
 
         {/* Spacer */}
         <div style={{ width: 36 }} />
+      </div>
+
+      {/* Single-line metadata — subtle, centered, no card */}
+      <div style={{ background: '#ffffff', padding: '6px 16px', borderBottom: '0.5px solid #C6C6C8', textAlign: 'center', position: 'relative', zIndex: 10 }}>
+        <span style={{ fontSize: 13, color: '#8E8E93' }}>
+          Generated in {secs}s · {wordsIn} words in · {wordsOut} words out
+        </span>
       </div>
 
       {/* Scrollable SOAP cards */}
@@ -310,39 +313,6 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
             onFlag={() => toggleFlag(s.key)}
           />
         ))}
-
-        {/* Meta grid */}
-        <div className="apple-card" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
-          {[
-            { label: 'Generated in', value: `${secs}s`                           },
-            { label: 'Model',        value: 'llama-3.1-8b'                        },
-            { label: 'Confidence',   value: 'High · 94%',         green: true     },
-            { label: 'Words',        value: `${wordsIn} in / ${wordsOut} out`     },
-          ].map(({ label, value, green }, idx) => (
-            <div
-              key={label}
-              style={{
-                padding: '12px 14px',
-                borderRight:  idx % 2 === 0 ? '0.5px solid #F2F2F7' : 'none',
-                borderBottom: idx < 2       ? '0.5px solid #F2F2F7' : 'none',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              <div style={{ fontSize: 10, color: '#8E8E93', marginBottom: 3, fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: green ? '#34C759' : '#000000', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {value}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Timestamp footer */}
-        <div style={{ textAlign: 'center', paddingTop: 4 }}>
-          <span style={{ fontSize: 11, color: '#C7C7CC', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-            {timestamp} · clears in {Math.floor(remaining / 60)}:{String(remaining % 60).padStart(2,'0')}
-          </span>
-        </div>
       </div>
 
       {/* Flag-copy confirmation overlay */}
