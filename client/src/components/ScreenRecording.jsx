@@ -11,9 +11,10 @@ function fmtTime(s) {
 }
 
 export default function ScreenRecording({ transcript, setTranscript, onStop, onCancel, showToast }) {
-  const [seconds,  setSeconds]  = useState(0);
-  const [interim,  setInterim]  = useState('');
-  const [recError, setRecError] = useState('');
+  const [seconds,     setSeconds]     = useState(0);
+  const [interim,     setInterim]     = useState('');
+  const [recError,    setRecError]    = useState('');
+  const [processing,  setProcessing]  = useState(false);
   const recognitionRef    = useRef(null);
   const shouldContinueRef = useRef(false);
   const startedAtRef      = useRef(Date.now());
@@ -70,10 +71,16 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
   const wordCount = fullText.trim() ? fullText.trim().split(/\s+/).length : 0;
 
   const handleStop = () => {
+    if (processing) return; /* debounce double-taps */
     if (wordCount === 0 && !recError) {
       showToast?.('No speech detected. Try again or use the demo patient button.');
       return;
     }
+    if (wordCount > 0 && wordCount < 5 && !recError) {
+      showToast?.('Please record at least 5 words.');
+      return;
+    }
+    setProcessing(true);
     vibrate([50, 50, 50]);
     shouldContinueRef.current = false;
     try { recognitionRef.current?.stop(); } catch {}

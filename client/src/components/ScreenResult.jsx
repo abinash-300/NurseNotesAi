@@ -322,13 +322,15 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
             <div
               key={label}
               style={{
-                padding: '14px 16px',
+                padding: '12px 14px',
                 borderRight:  idx % 2 === 0 ? '0.5px solid #F2F2F7' : 'none',
                 borderBottom: idx < 2       ? '0.5px solid #F2F2F7' : 'none',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
               }}
             >
-              <div style={{ fontSize: 11, color: '#8E8E93', marginBottom: 4, fontWeight: 500 }}>{label}</div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: green ? '#34C759' : '#000000', fontVariantNumeric: 'tabular-nums' }}>
+              <div style={{ fontSize: 10, color: '#8E8E93', marginBottom: 3, fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: green ? '#34C759' : '#000000', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {value}
               </div>
             </div>

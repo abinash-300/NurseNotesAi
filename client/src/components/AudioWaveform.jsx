@@ -64,8 +64,8 @@ export default function AudioWaveform({ active, height = 80 }) {
 
         draw();
       })
-      .catch(() => {
-        /* mic already held by speech recognition — silently skip; parent keeps static bars visible */
+      .catch((err) => {
+        /* mic already in use by speech recognition or unavailable — canvas stays blank, static fallback handled by parent */
       });
 
     return () => {

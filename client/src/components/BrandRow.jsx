@@ -34,8 +34,8 @@ export default function BrandRow({ state = 'idle', onProfile }) {
         NurseNote
       </span>
 
-      {/* idle: profile avatar */}
-      {state === 'idle' && (
+      {/* idle: profile avatar; recording/processing: spacer for balance */}
+      {state === 'idle' ? (
         <button
           onClick={onProfile}
           aria-label="Profile & settings"
@@ -49,6 +49,8 @@ export default function BrandRow({ state = 'idle', onProfile }) {
         >
           <User size={18} strokeWidth={1.8} />
         </button>
+      ) : (
+        <div style={{ width: 36 }} />
       )}
 
       {/* recording / processing: state badge */}

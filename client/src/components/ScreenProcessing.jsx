@@ -52,11 +52,15 @@ function buildPrompt(specialty, noteLength) {
 }
 
 async function callGroq(transcript, systemPrompt) {
+  const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+  if (!apiKey) {
+    throw new Error('Groq API key not configured. Set VITE_GROQ_API_KEY environment variable.');
+  }
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
+      'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
       model: MODEL,
@@ -180,7 +184,15 @@ export default function ScreenProcessing({ transcript, specialty = 'general', no
         const wait = Math.max(0, minDelay - elapsed);
         setTimeout(() => { if (!cancelled) onDone(soap, meta); }, wait);
       } catch (err) {
-        if (!cancelled) onError(err instanceof SyntaxError ? 'Failed to parse AI response as JSON. Please try again.' : (err.message || String(err)));
+        if (!cancelled) {
+          if (err instanceof SyntaxError) {
+            onError('AI response format error. Please try again.');
+          } else if (err.message?.includes('Groq API key')) {
+            onError(err.message);
+          } else {
+            onError(err.message || 'Processing failed. Please try again.');
+          }
+        }
       }
     })();
     return () => { cancelled = true; };

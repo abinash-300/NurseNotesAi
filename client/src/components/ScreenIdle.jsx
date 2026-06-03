@@ -75,22 +75,25 @@ export default function ScreenIdle({
         <div className="flex flex-col gap-5 px-4 pb-12">
 
           {/* ── Large navigation title ──────────────────────── */}
-          <div ref={largeTitleRef} style={{ paddingTop: 20 }}>
+          <div ref={largeTitleRef} style={{ paddingTop: 20, transition: 'all 200ms ease', opacity: scrolled ? 0.5 : 1 }}>
             <div
               style={{
-                fontSize: 34,
+                fontSize: scrolled ? 18 : 34,
                 fontWeight: 800,
                 color: '#000000',
                 letterSpacing: '-0.025em',
                 lineHeight: 1,
                 fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                transition: 'font-size 200ms ease',
               }}
             >
               NurseNote
             </div>
-            <div style={{ fontSize: 14, color: '#8E8E93', marginTop: 5 }}>
-              Voice-to-SOAP in seconds
-            </div>
+            {!scrolled && (
+              <div style={{ fontSize: 14, color: '#8E8E93', marginTop: 5, transition: 'opacity 200ms ease' }}>
+                Voice-to-SOAP in seconds
+              </div>
+            )}
           </div>
 
           {/* ── Mic hero ───────────────────────────────────── */}
