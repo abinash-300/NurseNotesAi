@@ -52,9 +52,9 @@ function buildPrompt(specialty, noteLength) {
 }
 
 async function callGroq(transcript, systemPrompt) {
-  const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+  const apiKey = localStorage.getItem('nursenote_groq_key_override') || import.meta.env.VITE_GROQ_API_KEY;
   if (!apiKey) {
-    throw new Error('Groq API key not configured. Set VITE_GROQ_API_KEY environment variable.');
+    throw new Error('Groq API key not configured. Add your key in Settings or set VITE_GROQ_API_KEY.');
   }
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
@@ -202,6 +202,14 @@ export default function ScreenProcessing({ transcript, specialty = 'general', no
 
   return (
     <div className="screen">
+      {/* Indeterminate cyan bar — very top */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, zIndex: 30, background: 'rgba(6,182,212,0.15)', overflow: 'hidden' }} aria-hidden="true">
+        <div
+          className="animate-indeterminate"
+          style={{ position: 'absolute', height: '100%', background: '#06B6D4', width: '35%' }}
+        />
+      </div>
+
       <BrandRow state="processing" />
 
       <div className="flex-1 overflow-y-auto scroll-thin">

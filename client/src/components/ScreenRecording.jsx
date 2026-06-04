@@ -41,8 +41,13 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
     };
     r.onend   = () => { if (shouldContinueRef.current) { try { r.start(); } catch {} } };
     r.onerror = (e) => {
-      if (e.error !== 'aborted') {
-        setRecError(`Recognition error: ${e.error}`);
+      if (e.error === 'not-allowed') {
+        setRecError('Microphone blocked. Go to browser Settings → Site Settings → Microphone → Allow, then refresh.');
+        shouldContinueRef.current = false;
+      } else if (e.error === 'no-speech') {
+        /* non-fatal: speech recognition timed out, will restart via onend */
+      } else if (e.error !== 'aborted') {
+        setRecError(`Recognition error: ${e.error}. Try refreshing the page.`);
         shouldContinueRef.current = false;
       }
     };
@@ -70,6 +75,8 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
   const lines     = fullText.replace(/\s+/g, ' ').split(/(?<=[.!?])\s+/).filter(Boolean);
   const wordCount = fullText.trim() ? fullText.trim().split(/\s+/).length : 0;
 
+  const FILLER_RE = /\b(um+|uh+|er+|ah+|hmm+)\b/gi;
+
   const handleStop = () => {
     if (processing) return; /* debounce double-taps */
     if (wordCount === 0 && !recError) {
@@ -80,6 +87,14 @@ export default function ScreenRecording({ transcript, setTranscript, onStop, onC
       showToast?.('Please record at least 5 words.');
       return;
     }
+
+    /* Filler word intelligence */
+    const fillerMatches = (transcript || '').match(FILLER_RE) || [];
+    const totalWords    = (transcript || '').trim().split(/\s+/).filter(Boolean).length;
+    if (totalWords > 10 && fillerMatches.length / totalWords > 0.20) {
+      showToast?.(`High filler word count (${fillerMatches.length} "um/uh" detected). Note generated — consider re-recording for a cleaner result.`);
+    }
+
     setProcessing(true);
     vibrate([50, 50, 50]);
     shouldContinueRef.current = false;

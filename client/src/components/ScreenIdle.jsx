@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight, Activity, Smartphone, Lock } from 'lucide-react';
+import { ChevronRight, Activity, Smartphone, Lock, Keyboard } from 'lucide-react';
 import BrandRow from './BrandRow.jsx';
 import ProfileSheet from './ProfileSheet.jsx';
 import MicCore from './MicCore.jsx';
@@ -49,6 +49,7 @@ export default function ScreenIdle({
   onStart, onDemo, sessions = [], onOpenSession,
   specialty = 'general', onSpecialtyChange,
   noteLength = 'standard', onNoteLengthChange,
+  onSettings, onAbout,
 }) {
   const [showProfile, setShowProfile] = useState(false);
   const [scrolled,    setScrolled]    = useState(false);
@@ -265,9 +266,17 @@ export default function ScreenIdle({
 
           {/* ── Privacy footer ─────────────────────────────── */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-            <Lock size={10} style={{ color: '#C7C7CC' }} />
+            <Lock size={10} style={{ color: '#C7C7CC' }} aria-hidden="true" />
             <span style={{ fontSize: 11, color: '#C7C7CC', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               End-to-end encrypted · Nothing stored
+            </span>
+          </div>
+
+          {/* ── Keyboard shortcuts (desktop only) ─────────── */}
+          <div className="kbd-footer" style={{ alignItems: 'center', justifyContent: 'center', gap: 6, flexWrap: 'wrap' }}>
+            <Keyboard size={10} style={{ color: '#C7C7CC' }} aria-hidden="true" />
+            <span style={{ fontSize: 11, color: '#C7C7CC', letterSpacing: '0.04em' }}>
+              Space to record · Enter to generate · Esc to cancel · ⌘C to copy
             </span>
           </div>
 
@@ -278,6 +287,8 @@ export default function ScreenIdle({
       {showProfile && (
         <ProfileSheet
           onDemo={onDemo}
+          onSettings={onSettings}
+          onAbout={onAbout}
           onClose={() => setShowProfile(false)}
         />
       )}

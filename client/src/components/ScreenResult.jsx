@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Copy, Check, Edit2, Flag, Share2, Plus, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowLeft, ArrowDown, Copy, Check, Edit2, Flag, Share2, Plus, X } from 'lucide-react';
 
 const vibrate = (pattern) => { try { navigator.vibrate?.(pattern); } catch {} };
 
@@ -161,13 +161,46 @@ function SoapCard({ section, body, index, onSave, flagged, onFlag }) {
   );
 }
 
-export default function ScreenResult({ soap, meta, onNew, showToast }) {
+export default function ScreenResult({ soap, meta, onNew, showToast, showCopyToast }) {
   const [fullCopied,  setFullCopied]  = useState(false);
   const [editedSoap,  setEditedSoap]  = useState(() => ({ ...soap }));
   const [,            forceUpdate]    = useState(0);
   const [remaining,   setRemaining]   = useState(CLEAR_SECS);
   const [flaggedKeys, setFlaggedKeys] = useState(new Set());
   const [copyConfirm, setCopyConfirm] = useState(false);
+
+  /* Pull-to-refresh state */
+  const [pullDelta,  setPullDelta]  = useState(0);
+  const scrollRef     = useRef(null);
+  const touchStartY   = useRef(0);
+  const rawDelta      = useRef(0);
+  const pullActive    = useRef(false);
+  const PULL_THRESHOLD = 90;
+
+  const handleTouchStart = (e) => {
+    if ((scrollRef.current?.scrollTop ?? 0) === 0) {
+      touchStartY.current = e.touches[0].clientY;
+      pullActive.current  = true;
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (!pullActive.current) return;
+    rawDelta.current = e.touches[0].clientY - touchStartY.current;
+    if (rawDelta.current > 0) {
+      setPullDelta(Math.min(rawDelta.current * 0.45, 64));
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (rawDelta.current >= PULL_THRESHOLD) {
+      vibrate(30);
+      onNew();
+    }
+    setPullDelta(0);
+    pullActive.current = false;
+    rawDelta.current   = 0;
+  };
 
   useEffect(() => {
     const t = setInterval(() => forceUpdate((n) => n + 1), 15_000);
@@ -216,6 +249,7 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
     vibrate(30);
     try { await navigator.clipboard.writeText(fullNote); } catch {}
     setFullCopied(true);
+    showCopyToast?.('Copied to clipboard');
     setTimeout(() => setFullCopied(false), 1800);
   };
 
@@ -224,6 +258,7 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
     try { await navigator.clipboard.writeText(fullNoteWithFlags); } catch {}
     setFullCopied(true);
     setCopyConfirm(false);
+    showCopyToast?.('Copied to clipboard');
     setTimeout(() => setFullCopied(false), 1800);
   };
 
@@ -294,7 +329,11 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
 
       {/* Scrollable SOAP cards */}
       <div
+        ref={scrollRef}
         className="scroll-thin"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         style={{
           flex: 1, overflowY: 'auto', position: 'relative', zIndex: 10,
           display: 'flex', flexDirection: 'column', gap: 10,
@@ -302,6 +341,27 @@ export default function ScreenResult({ soap, meta, onNew, showToast }) {
           paddingBottom: 'calc(110px + env(safe-area-inset-bottom))',
         }}
       >
+        {/* Pull-to-new indicator */}
+        {pullDelta > 8 && (
+          <div
+            aria-hidden="true"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              height: pullDelta, overflow: 'hidden', marginBottom: -8,
+              transition: 'height 60ms linear',
+            }}
+          >
+            <ArrowDown
+              size={18}
+              style={{
+                color: '#06B6D4',
+                transform: pullDelta >= 52 ? 'rotate(180deg)' : 'none',
+                transition: 'transform 150ms ease',
+              }}
+            />
+          </div>
+        )}
+
         {SOAP_META.map((s, i) => (
           <SoapCard
             key={s.key}
